@@ -144,11 +144,7 @@ setup_game :-
 	
 show_game :-
 
-	% write('Where do you want to play? '),
-	% read(A),
-	% nl,
-	% write('Ok, playing at '),
-	% write(A),
+	
 	
 	% line 1
 	cell(a1, A1), 
@@ -200,7 +196,7 @@ show_game :-
 	cell(c5, C5), 
 	cell(d5, D5), 
 	cell(e5, E5), 
-	cell(f5, F5),
+	cell(f5, F5),cell(a1, A),
 	cell(g5, G5), 
 	cell(h5, H5), 
 	cell(i5, I5),
