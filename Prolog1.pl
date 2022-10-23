@@ -203,9 +203,9 @@ can_playComp(X, Y) :-
 	basGauche(X,Y).
 
 /* fonction prenant en charge l'élimination de cellules */	
-eliminate(X, Y) :-
+% eliminate(X, Y) :-
 
-/* fonctions de jeu */
+/* fonctions d'action dans le jeu */
 play(X, Y) :-	
 	can_play(X,Y),
 	retract( cell(X, b) ),
@@ -222,16 +222,9 @@ play_comp(X, Y) :-
 	assert( cell(Y, n) ),
 	show_game.
 	
-	
-	
+/* fonctions d'affichage du jeu */
 show_game :-
 
-	% write('Where do you want to play? '),
-	% read(A),
-	% nl,
-	% write('Ok, playing at '),
-	% write(A),
-	
 	% line 1
 	cell(a1, A1), 
 	cell(b1, B1), 
@@ -294,6 +287,7 @@ show_game :-
 	L4 = [4, A4, B4, C4, D4, E4, F4, G4, H4, I4],
 	L5 = [5, A5, B5, C5, D5, E5, F5, G5, H5, I5],
 	
+	
 	nl,	
 	nl,
 	write(L0),
@@ -311,7 +305,25 @@ show_game :-
 	nl,
 	write('Your opponent has played!'),
 	nl,
-	nl.
+	nl,
+	
+	/* On vérifie ici si la partie est terminée */
+	findall( C, cell(C, b), R ), /* On compile une liste de tout les occurences de cellules appartenant à b */
+	length(R, N), /* la longueur de cette liste est ici calculé*/
+	findall( B, cell(B, n), Q ), /* On compile une liste de tout les occurences de cellules appartenant à n */
+	length(Q, F), /* la longueur de cette liste est ici calculé*/
+	write('La partie est fini?'),
+	(F =:= 0;N =:= 0), /* Si la partie est fini, cette condition est vrai et le programme continue*/
+	nl,
+	write('True'),
+	nl,
+	write('Vous avez gagne?'),
+	(F =:= 0), /* Cette condition affichera false si vous avez perdu */
+	nl,
+	write('True').
+
+	
+		
 
 
 

@@ -188,12 +188,24 @@ can_play(X, Y) :-
 	haut(X,Y); 
 	hautGauche(X,Y); 
 	basGauche(X,Y).
+	
+/* fonction déterminant si un coup est permis pour le joueur ordinateur */
+can_playComp(X, Y) :-
+	cell(X, n),
+	cell(Y, -),
+	droite(X,Y); 
+	gauche(X,Y); 
+	hautDroite(X,Y); 
+	basDroite(X,Y); 
+	bas(X,Y); 
+	haut(X,Y); 
+	hautGauche(X,Y); 
+	basGauche(X,Y).
 
 /* fonction prenant en charge l'élimination de cellules */	
-eliminate(X, Y) :-
-	
+% eliminate(X, Y) :-
 
-/* fonction de jeu */
+/* fonctions de jeu */
 play(X, Y) :-	
 	can_play(X,Y),
 	retract( cell(X, b) ),
@@ -202,23 +214,16 @@ play(X, Y) :-
 	assert( cell(Y, b) ),
 	show_game.
 		
-%play_comp(X, Y) :-		
-%	retract( cell(X, n) ),
-%	assert( cell(X, -) ),
-%	retract( cell(Y, -) ),
-%	assert( cell(Y, n) ),
-%	show_game.
-	
-	
+play_comp(X, Y) :-	
+	can_playComp(X, Y),
+	retract( cell(X, n) ),
+	assert( cell(X, -) ),
+	retract( cell(Y, -) ),
+	assert( cell(Y, n) ),
+	show_game.
 	
 show_game :-
 
-	% write('Where do you want to play? '),
-	% read(A),
-	% nl,
-	% write('Ok, playing at '),
-	% write(A),
-	
 	% line 1
 	cell(a1, A1), 
 	cell(b1, B1), 
@@ -281,6 +286,7 @@ show_game :-
 	L4 = [4, A4, B4, C4, D4, E4, F4, G4, H4, I4],
 	L5 = [5, A5, B5, C5, D5, E5, F5, G5, H5, I5],
 	
+	
 	nl,	
 	nl,
 	write(L0),
@@ -298,7 +304,24 @@ show_game :-
 	nl,
 	write('Your opponent has played!'),
 	nl,
-	nl.
+	nl,
+	
+	findall( C, cell(C, b), R ),
+	length(R, N),
+	findall( B, cell(B, n), Q ),
+	length(Q, F),
+	write('La partie est fini?'),
+	(F =:= 0;N =:= 0),
+	nl,
+	write('True'),
+	nl,
+	write('Les blancs on gagnes?'),
+	(F =:= 0),
+	nl,
+	write('Les noirs on gagnes?'),
+	(N =:= 0).
+	
+		
 
 
 
