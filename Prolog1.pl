@@ -7,24 +7,24 @@
 % cell(a2,n), cell(b2,n), cell(c2,n), cell(d2,n), cell(e2,n), cell(f2,n), cell(g2,n), cell(h2,n), cell(i2,n),
 % cell(a1,n), cell(b1,n), cell(c1,n), cell(d1,n), cell(e1,n), cell(f1,n), cell(g1,n), cell(h1,n), cell(i1,n)].
 
-cell(a5,b).
-cell(b5,b).
-cell(c5,b).
-cell(d5,b).
-cell(e5,b).
-cell(f5,b).
-cell(g5,b).
-cell(h5,b).
-cell(i5,b).
-cell(a4,b).
-cell(b4,b).
-cell(c4,b).
-cell(d4,b).
-cell(e4,b).
-cell(f4,b).
-cell(g4,b).
-cell(h4,b).
-cell(i4,b).
+cell(a5,n).
+cell(b5,n).
+cell(c5,n).
+cell(d5,n).
+cell(e5,n).
+cell(f5,n).
+cell(g5,n).
+cell(h5,n).
+cell(i5,n).
+cell(a4,n).
+cell(b4,n).
+cell(c4,n).
+cell(d4,n).
+cell(e4,n).
+cell(f4,n).
+cell(g4,n).
+cell(h4,n).
+cell(i4,n).
 cell(a3,n).
 cell(b3,b). 
 cell(c3,n). 
@@ -34,24 +34,24 @@ cell(f3,n).
 cell(g3,b). 
 cell(h3,n). 
 cell(i3,b).
-cell(a2,n). 
-cell(b2,n). 
-cell(c2,n). 
-cell(d2,n). 
-cell(e2,n). 
-cell(f2,n). 
-cell(g2,n). 
-cell(h2,n). 
-cell(i2,n).
-cell(a1,n). 
-cell(b1,n). 
-cell(c1,n). 
-cell(d1,n). 
-cell(e1,n). 
-cell(f1,n). 
-cell(g1,n).
-cell(h1,n).
-cell(i1,n).
+cell(a2,b). 
+cell(b2,b). 
+cell(c2,b). 
+cell(d2,b). 
+cell(e2,b). 
+cell(f2,b). 
+cell(g2,b). 
+cell(h2,b). 
+cell(i2,b).
+cell(a1,b). 
+cell(b1,b). 
+cell(c1,b). 
+cell(d1,b). 
+cell(e1,b). 
+cell(f1,b). 
+cell(g1,b).
+cell(h1,b).
+cell(i1,b).
 
 /* Liaison des cases */
 haut(a1, a2).
@@ -166,6 +166,11 @@ droite(f5,g5).
 droite(g5,h5).
 droite(h5,i5).
 
+/* Liaison d'élimination */
+%droite_r(X, X).
+%droite_r(X, Y) :- droite(X,Z), droite_r(Z,Y), cell(X, A), cell(Y, A), cell(Z, A).
+
+
 /* Liaison inverse */
 gauche(X, Y) :- 
     droite(Y, X).
@@ -176,11 +181,18 @@ basGauche(X,Y) :-
 basDroite(X,Y) :-
     hautGauche(Y,X).
 
+/* Liaison d'élimination */
+elim_droite(X, C) :- droite(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_droite(Y, C).
+elim_haut(X, C) :- haut(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_haut(Y, C).
+
+verif_droite(X, Y) :- droite(X,Y), cell(Y, B), elim_droite(Y, B).
+verif_haut(X, Y) :- haut(X,Y), cell(Y, B), elim_haut(Y, B).
+
 /* fonction déterminant si un coup est permis */
 can_play(X, Y) :-
 	cell(X, b),
 	cell(Y, -),
-	droite(X,Y); 
+	droite(X,Y);
 	gauche(X,Y); 
 	hautDroite(X,Y); 
 	basDroite(X,Y); 
@@ -203,7 +215,9 @@ can_playComp(X, Y) :-
 	basGauche(X,Y).
 
 /* fonction prenant en charge l'élimination de cellules */	
-% eliminate(X, Y) :-
+eliminate(X, A) :-
+	retract( cell(X, A) ),
+	assert( cell(X, -) ).
 
 /* fonctions d'action dans le jeu */
 play(X, Y) :-	
@@ -212,6 +226,8 @@ play(X, Y) :-
 	assert( cell(X, -) ),
 	retract( cell(Y, -) ),
 	assert( cell(Y, b) ),
+	not(verif_droite(X,Y)),
+	not(verif_haut(X,Y)),
 	show_game.
 		
 play_comp(X, Y) :-	
@@ -280,27 +296,27 @@ show_game :-
 	cell(h5, H5), 
 	cell(i5, I5),
 
-	L0 = [0, a, b, c, d, e, f, g, h, i],
-	L1 = [1, A1, B1, C1, D1, E1, F1, G1, H1, I1],
-	L2 = [2, A2, B2, C2, D2, E2, F2, G2, H2, I2],
-	L3 = [3, A3, B3, C3, D3, E3, F3, G3, H3, I3],
-	L4 = [4, A4, B4, C4, D4, E4, F4, G4, H4, I4],
 	L5 = [5, A5, B5, C5, D5, E5, F5, G5, H5, I5],
-	
+	L4 = [4, A4, B4, C4, D4, E4, F4, G4, H4, I4],
+	L3 = [3, A3, B3, C3, D3, E3, F3, G3, H3, I3],
+	L2 = [2, A2, B2, C2, D2, E2, F2, G2, H2, I2],
+	L1 = [1, A1, B1, C1, D1, E1, F1, G1, H1, I1],
+	L0 = [0, a, b, c, d, e, f, g, h, i],
+
 	
 	nl,	
 	nl,
-	write(L0),
-	nl,
-	write(L1),
-	nl,
-	write(L2),
-	nl,
-	write(L3),
+	write(L5),
 	nl,
 	write(L4),
 	nl,
-	write(L5),
+	write(L3),
+	nl,
+	write(L2),
+	nl,
+	write(L1),
+	nl,
+	write(L0),
 	nl,
 	nl,
 	write('Your opponent has played!'),
