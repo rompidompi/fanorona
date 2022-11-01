@@ -175,6 +175,87 @@ basGauche(X,Y) :-
     hautDroite(Y,X).
 basDroite(X,Y) :-
     hautGauche(Y,X).
+    
+/* minimax */
+change_min_max(max, min).
+change_min_max(min, max).
+
+% random_int_1n
+%.......................................
+% returns a random integer from 1 to N
+%
+random_int_1n(N, V) :-
+V is random(N) + 1,
+!.
+
+find_all_empty_cells(EmptyCells) :- findall(X, (cell(X, -)), EmptyCells).
+eval(Move, Value).
+    
+nearby_cells(X,Y) :-
+    droite(X,Y),cell(Y,-),cell(X,n);
+    gauche(X,Y),cell(Y,-),cell(X,n);
+    haut(X,Y),cell(Y,-),cell(X,n);
+    bas(X,Y),cell(Y,-),cell(X,n);
+    basDroite(X,Y),cell(Y,-),cell(X,n);
+    basGauche(X,Y),cell(Y,-),cell(X,n);
+    hautDroite(X,Y),cell(Y,-),cell(X,n);
+    hautGauche(X,Y),cell(Y,-),cell(X,n).
+
+find_all_playable_moves(Moves):-
+    findall([X,Y], nearby_cells(X,Y), Moves).
+
+minimax2(Player, Board, BestMove, Value):-
+      find_all_playable_moves(PlayableMoves),!,
+      best(Player, Board, PlayableMoves, BestMove, Value).
+
+% if only one move possible
+best(Player, Board, [Move], BestMove, Value):-
+    %applyMove(Player, Board, Move, ExpectedNewBoard),
+    change_min_max(Player, Player2),
+    minimax2(Player2, ExpectedNewBoard, _S, Value),
+    BestMove = Move.
+
+% if multiple moves possible
+best(Player, Board, [Move|RemainingPlayableMoves], BestMove, BestMoveValue):-
+    %applyMove(Player, Board, Move, ExpectedNewBoard),
+    change_min_max(Player, Player2),
+    minimax2(Player2, ExpectedNewBoard, _S, MoveValue),
+    best(Player, Board, RemainingPlayableMoves, Move2, Move2Value),
+    better(Player, Move, MoveValue, Move2, Move2Value, BestMove, BestMoveValue).
+
+% if player is maximizing, then greater is better
+better(Player, Move1, Move1Value, Move2, Move2Value, BestMove, BestMoveValue):-
+    maximizing(Player),
+    Move1Value > Move2Value,
+    BestMove = Move1,
+    BestMoveValue = Move1Value.
+
+% if player is minimizing, then lesser is better
+better(Player, Move1, Move1Value, Move2, Move2Value, BestMove, BestMoveValue):-
+    minimizing(Player),
+    Move1Value < Move2Value,
+    BestMove = Move1,
+    BestMoveValue = Move1Value.
+
+% if moves have equal value, pick one at random
+better(Player, Move1, Move1Value, Move2, Move2Value, BestMove, BestMoveValue):-
+    Move1Value == Move2Value,
+    random_int_1n(10,R),
+    pick_random_move(R, Move1,Move1Value,Move2,Move2Value,BestMove,BestMoveValue).
+
+% otherwise, second move is better
+better(Player, Move1, Move1Value, Move2, Move2Value, BestMove, BestMoveValue):-
+    BestMove = Move2,
+    BestMoveValue = Move2Value.
+
+pick_random_move(R, Move1, Move1Value, _, _, BestMove, BestMoveValue):-
+    R < 6,
+    BestMove = Move1,
+    BestMoveValue = Move1Value.
+
+pick_random_move(_, _, _, Move2, Move2Value, BestMove, BestMoveValue):-
+    BestMove = Move2,
+    BestMoveValue = Move2Value.
 
 /* fonction déterminant si un coup est permis */
 can_play(X, Y) :-
