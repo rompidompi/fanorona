@@ -180,10 +180,17 @@ basGauche(X,Y) :-
     hautDroite(Y,X).
 basDroite(X,Y) :-
     hautGauche(Y,X).
+	
+
+
+playable(X, Y) :- 
+	(droite(X,Y), cell(Y, -)).
+	
+	
 
 /* Liaison d'élimination */
 elim_droite(X, C) :- droite(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_droite(Y, C).
-elim_haut(X, A) :- haut(X,Y), cell(X, A), cell(Y, B), A \= B, eliminate(Y, B), elim_haut(Y, A).
+elim_haut(X, C) :- haut(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_haut(Y, C).
 
 verif_droite(X, Y) :- droite(X,Y), cell(Y, B), elim_droite(Y, B).
 verif_haut(X, Y) :- haut(X,Y), cell(Y, B), elim_haut(Y, B).
@@ -200,6 +207,8 @@ can_play(X, Y) :-
 	haut(X,Y); 
 	hautGauche(X,Y); 
 	basGauche(X,Y).
+	
+
 	
 /* fonction déterminant si un coup est permis pour le joueur ordinateur */
 can_playComp(X, Y) :-
