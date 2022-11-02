@@ -193,44 +193,79 @@ elim_basGauche(X, C) :- basGauche(X,Y), cell(Y, B), C \= B, eliminate(Y, B), eli
 elim_basDroite(X, C) :- basDroite(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_basDroite(Y, C).
 
 %verif_droite(X, Y) :- droite(X,Y), cell(Y, B), not(elim_gauche(X,B)), elim_droite(Y, B). ------ Version destruction avant et arriere
-verif_coup(X,Y) :-
-    verif_bas(X,Y);
-    verif_basDroite(X,Y);
-    verif_basGauche(X,Y);
-    verif_droite(X,Y);
-    verif_gauche(X,Y);
-    verif_haut(X,Y);
-    verif_hautDroite(X,Y);
-    verif_hautGauche(X,Y).
+jouer_coup(X,Y) :-
+    jouer_bas(X,Y);
+    jouer_basDroite(X,Y);
+    jouer_basGauche(X,Y);
+    jouer_droite(X,Y);
+    jouer_gauche(X,Y);
+    jouer_haut(X,Y);
+    jouer_hautDroite(X,Y);
+    jouer_hautGauche(X,Y).
 
-verif_droite(X, Y) :- droite(X,Y), cell(Y, B), elim_droite(Y, B).
-verif_gauche(X, Y) :- gauche(X,Y), cell(Y, B), elim_gauche(Y, B).
-verif_haut(X, Y) :- haut(X,Y), cell(Y, B), elim_haut(Y, B).
-verif_hautGauche(X, Y) :- hautGauche(X,Y), cell(Y, B), elim_hautGauche(Y, B).
-verif_hautDroite(X, Y) :- hautDroite(X,Y), cell(Y, B), elim_hautDroite(Y, B).
-verif_bas(X, Y) :- bas(X,Y), cell(Y, B), elim_bas(Y, B).
-verif_basGauche(X, Y) :- basGauche(X,Y), cell(Y, B), elim_basGauche(Y, B).
-verif_basDroite(X, Y) :- basDroite(X,Y), cell(Y, B), elim_basDroite(Y, B).
+jouer_droite(X, Y) :- droite(X,Y), cell(Y, B), elim_droite(Y, B).
+jouer_gauche(X, Y) :- gauche(X,Y), cell(Y, B), elim_gauche(Y, B).
+jouer_haut(X, Y) :- haut(X,Y), cell(Y, B), elim_haut(Y, B).
+jouer_hautGauche(X, Y) :- hautGauche(X,Y), cell(Y, B), elim_hautGauche(Y, B).
+jouer_hautDroite(X, Y) :- hautDroite(X,Y), cell(Y, B), elim_hautDroite(Y, B).
+jouer_bas(X, Y) :- bas(X,Y), cell(Y, B), elim_bas(Y, B).
+jouer_basGauche(X, Y) :- basGauche(X,Y), cell(Y, B), elim_basGauche(Y, B).
+jouer_basDroite(X, Y) :- basDroite(X,Y), cell(Y, B), elim_basDroite(Y, B).
 
 
 /* Boucle pour déterminer nombre de pions adverses */
-nbrPion_droite(X, Count) :- cell(X, B), compteur_droite(X, B, Count).
+verifPion(X, Y, C) :- 
+    verifPion_droite(X, Y, C);
+    verifPion_bas(X, Y, C);
+    verifPion_basDroite(X, Y, C);
+    verifPion_basGauche(X, Y, C);
+    verifPion_gauche(X, Y, C);
+    verifPion_haut(X, Y, C);
+    verifPion_hautDroite(X, Y, C);
+    verifPion_hautGauche(X, Y, C).
+
+
+verifPion_droite(X,Y,C) :- droite(X,Y), cell(X, B), nbrPion_droite(Y, B, C).
+verifPion_haut(X,Y,C) :- haut(X,Y), cell(X, B), nbrPion_haut(Y, B, C).
+verifPion_gauche(X,Y,C) :- gauche(X,Y), cell(X, B), nbrPion_gauche(Y, B, C).
+verifPion_hautGauche(X,Y,C) :- hautGauche(X,Y), cell(X, B), nbrPion_hautGauche(Y, B, C).
+verifPion_hautDroite(X,Y,C) :- hautDroite(X,Y), cell(X, B), nbrPion_hautDroite(Y, B, C).
+verifPion_bas(X,Y,C) :- bas(X,Y), cell(X, B), nbrPion_bas(Y, B, C).
+verifPion_basGauche(X,Y,C) :- basGauche(X,Y), cell(X, B), nbrPion_basGauche(Y, B, C).
+verifPion_basDroite(X,Y,C) :- basDroite(X,Y), cell(X, B), nbrPion_basDroite(Y, B, C).
+
+
+nbrPion_droite(X, B, Count) :- compteur_droite(X, B, Count).
 compteur_droite(X, C, 0) :- cell(X, B), C \= B.
-compteur_droite(X, C, Count) :- !, droite(X,Y), cell(Y, B), C \= B, compteur_droite(Y, C, Count2), Count is Count2+1.
+compteur_droite(X, C, Count) :- !, droite(X,Y), cell(Y, B), C \= B, B \= -, compteur_droite(Y, C, Count2), Count is Count2+1.
 
-nbrPion_gauche(X, Count) :- cell(X, B), compteur_gauche(X, B, Count).
+nbrPion_gauche(X, B, Count) :- compteur_gauche(X, B, Count).
 compteur_gauche(X, C, 0) :- cell(X, B), C \= B.
-compteur_gauche(X, C, Count) :- gauche(X,Y), cell(Y, B), C \= B, compteur_gauche(Y, C, Count2), Count is Count2+1.
+compteur_gauche(X, C, Count) :- gauche(X,Y), cell(Y, B), C \= B, B \= -, compteur_gauche(Y, C, Count2), Count is Count2+1.
 
-nbrPion_haut(X, Count) :- cell(X, B), compteur_haut(X, B, Count).
+nbrPion_haut(X, B, Count) :- compteur_haut(X, B, Count).
 compteur_haut(X, C, 0) :- cell(X, B), C \= B.
-compteur_haut(X, C, Count) :- haut(X,Y), cell(Y, B), C \= B, compteur_haut(Y, C, Count2), Count is Count2+1.
+compteur_haut(X, C, Count) :- haut(X,Y), cell(Y, B), C \= B, B \= -, compteur_haut(Y, C, Count2), Count is Count2+1.
 
-nbrPion_hautGauche(X, Count) :- cell(X, B), compteur_hautGauche(X, B, Count).
+nbrPion_hautGauche(X, B, Count) :- compteur_hautGauche(X, B, Count).
 compteur_hautGauche(X, C, 0) :- cell(X, B), C \= B.
-compteur_hautGauche(X, C, Count) :- hautGauche(X,Y), cell(Y, B), C \= B, compteur_hautGauche(Y, C, Count2), Count is Count2+1.
+compteur_hautGauche(X, C, Count) :- hautGauche(X,Y), cell(Y, B), C \= B, B \= -, compteur_hautGauche(Y, C, Count2), Count is Count2+1.
 
+nbrPion_hautDroite(X, B, Count) :- compteur_hautDroite(X, B, Count).
+compteur_hautDroite(X, C, 0) :- cell(X, B), C \= B.
+compteur_hautDroite(X, C, Count) :- hautDroite(X,Y), cell(Y, B), C \= B, B \= -, compteur_hautDroite(Y, C, Count2), Count is Count2+1.
 
+nbrPion_bas(X, B, Count) :- compteur_bas(X, B, Count).
+compteur_bas(X, C, 0) :- cell(X, B), C \= B.
+compteur_bas(X, C, Count) :- bas(X,Y), cell(Y, B), C \= B, B \= -, compteur_bas(Y, C, Count2), Count is Count2+1.
+
+nbrPion_basGauche(X, B, Count) :- compteur_basGauche(X, B, Count).
+compteur_basGauche(X, C, 0) :- cell(X, B), C \= B.
+compteur_basGauche(X, C, Count) :- basGauche(X,Y), cell(Y, B), C \= B, B \= -, compteur_basGauche(Y, C, Count2), Count is Count2+1.
+
+nbrPion_basDroite(X, B, Count) :- compteur_basDroite(X, B, Count).
+compteur_basDroite(X, C, 0) :- cell(X, B), C \= B.
+compteur_basDroite(X, C, Count) :- basDroite(X,Y), cell(Y, B), C \= B, B \= -, compteur_basDroite(Y, C, Count2), Count is Count2+1.
 
 
 /* fonction déterminant si un coup est permis */
@@ -269,11 +304,13 @@ eliminate(X, A) :-
 /* fonctions d'action dans le jeu */
 play(X, Y) :-	
 	can_play(X,Y),
+
 	retract( cell(X, b) ),
 	assert( cell(X, -) ),
 	retract( cell(Y, -) ),
 	assert( cell(Y, b) ),
-	not(verif_coup(X,Y)),
+
+	not(jouer_coup(X,Y)),
 	show_game.
 		
 play_comp(X, Y) :-	
