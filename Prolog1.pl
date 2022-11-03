@@ -180,7 +180,19 @@ basGauche(X,Y) :-
     hautDroite(Y,X).
 basDroite(X,Y) :-
     hautGauche(Y,X).
-	
+
+nearby_cells(X,Y):-
+    droite(X,Y),cell(Y,-),cell(X,n);
+    gauche(X,Y),cell(Y,-),cell(X,n);
+    haut(X,Y),cell(Y,-),cell(X,n);
+    bas(X,Y),cell(Y,-),cell(X,n);
+    basDroite(X,Y),cell(Y,-),cell(X,n);
+    basGauche(X,Y),cell(Y,-),cell(X,n);
+    hautDroite(X,Y),cell(Y,-),cell(X,n);
+    hautGauche(X,Y),cell(Y,-),cell(X,n).
+
+find_all_playable_moves(Moves):-
+    findall([X,Y], nearby_cells(X,Y), Moves).
 
 /* Liaison d'élimination */
 elim_droite(X, C) :- droite(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_droite(Y, C).
@@ -212,19 +224,57 @@ jouer_bas(X, Y) :- bas(X,Y), cell(Y, B), elim_bas(Y, B).
 jouer_basGauche(X, Y) :- basGauche(X,Y), cell(Y, B), elim_basGauche(Y, B).
 jouer_basDroite(X, Y) :- basDroite(X,Y), cell(Y, B), elim_basDroite(Y, B).
 
-
 /* Boucle pour déterminer nombre de pions adverses */
 verifPion(X, Y, C) :- 
-    verifPion_droite(X, Y, C);
-    verifPion_bas(X, Y, C);
-    verifPion_basDroite(X, Y, C);
-    verifPion_basGauche(X, Y, C);
-    verifPion_gauche(X, Y, C);
-    verifPion_haut(X, Y, C);
-    verifPion_hautDroite(X, Y, C);
-    verifPion_hautGauche(X, Y, C).
+    verifPion_droite(X, Y, C),!;
+    verifPion_bas(X, Y, C),!;
+    verifPion_basDroite(X, Y, C),!;
+    verifPion_basGauche(X, Y, C),!;
+    verifPion_gauche(X, Y, C),!;
+    verifPion_haut(X, Y, C),!;
+    verifPion_hautDroite(X, Y, C),!;
+    verifPion_hautGauche(X, Y, C),!.
 
+head([H|_], H).
 
+find_best_move(Move, Score):-
+	find_all_playable_moves(Moves),
+    return_best_move(Moves, Move, Score).
+
+%base case : la liste est vide -> retourner 0 comme valeur de BestScore.
+return_best_move([], [], 0).
+return_best_move([H|T], BestMove, BestScore) :-
+    get_score(H, C),
+    TempScore = C,
+    TempBestMove = H,
+    return_best_move(T, NewBestMove, NewBestScore),
+    eval_score(TempBestMove, TempScore, NewBestMove, NewBestScore, BestMove, BestScore),!.
+
+% eval_score(+score1, +score2, -BestScore)
+eval_score(Move1, Score1, _, Score2, Move1, Score1) :-
+    Score1 > Score2.
+eval_score(_, Score1, Move2, Score2, Move2, Score2) :-
+    Score1 < Score2.
+eval_score(Move1, Score1, Move2, Score2, Move, Score):-
+    Score1 == Score2,
+    random(1,10,R),
+    get_random_move(R, Move1, Score1, Move2, Score2, Move, Score).
+
+get_random_move(R, Move1, Score1, _, _, Move1, Score1):-
+    R < 6,!.
+get_random_move(_, _, _, Move2, Score2, Move2, Score2).
+    
+get_score([H|T], C):-
+    head(T, L),!,
+    verifPion(H, L, C).
+
+case_a_compter(X, 0) :-
+    cell(X,C),
+    C == -,!.
+case_a_compter(X, 1) :-
+    cell(X,C),
+    C \= -,!.
+    
 verifPion_droite(X,Y,C) :- droite(X,Y), cell(X, B), nbrPion_droite(Y, B, C).
 verifPion_haut(X,Y,C) :- haut(X,Y), cell(X, B), nbrPion_haut(Y, B, C).
 verifPion_gauche(X,Y,C) :- gauche(X,Y), cell(X, B), nbrPion_gauche(Y, B, C).
@@ -234,39 +284,109 @@ verifPion_bas(X,Y,C) :- bas(X,Y), cell(X, B), nbrPion_bas(Y, B, C).
 verifPion_basGauche(X,Y,C) :- basGauche(X,Y), cell(X, B), nbrPion_basGauche(Y, B, C).
 verifPion_basDroite(X,Y,C) :- basDroite(X,Y), cell(X, B), nbrPion_basDroite(Y, B, C).
 
-
-nbrPion_droite(X, B, Count) :- compteur_droite(X, B, Count).
+nbrPion_droite(X, B, Count) :- compteur_droite2(X, B, Count).
 compteur_droite(X, C, 0) :- cell(X, B), C \= B.
-compteur_droite(X, C, Count) :- !, droite(X,Y), cell(Y, B), C \= B, B \= -, compteur_droite(Y, C, Count2), Count is Count2+1.
+compteur_droite(X, C, Count) :- droite(X,Y), cell(Y, B), C \= B, B \= -, compteur_droite(Y, C, Count2), Count is Count2+1.
 
-nbrPion_gauche(X, B, Count) :- compteur_gauche(X, B, Count).
+%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases à gauche
+compteur_droite2(X, C, 0) :- cell(X, B), B == C,!.
+compteur_droite2(X, _, 1) :- not(droite(X,_)),!.
+compteur_droite2(X,C,Count) :- 
+    droite(X,Y),
+    compteur_droite2(Y, C, Count2),
+    case_a_compter(X, Z),
+    Count is Count2 + Z.
+    
+nbrPion_gauche(X, B, Count) :- compteur_gauche2(X, B, Count).
 compteur_gauche(X, C, 0) :- cell(X, B), C \= B.
 compteur_gauche(X, C, Count) :- gauche(X,Y), cell(Y, B), C \= B, B \= -, compteur_gauche(Y, C, Count2), Count is Count2+1.
 
-nbrPion_haut(X, B, Count) :- compteur_haut(X, B, Count).
-compteur_haut(X, C, 0) :- cell(X, B), C \= B.
-compteur_haut(X, C, Count) :- haut(X,Y), cell(Y, B), C \= B, B \= -, compteur_haut(Y, C, Count2), Count is Count2+1.
+%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases à gauche
+compteur_gauche2(X, C, 0) :- cell(X, B), B == C,!.
+compteur_gauche2(X, _, 1) :- not(gauche(X,_)),!.
+compteur_gauche2(X,C,Count) :- 
+    gauche(X,Y),
+    compteur_gauche2(Y, C, Count2),
+    case_a_compter(X, Z),
+    Count is Count2 + Z.
 
-nbrPion_hautGauche(X, B, Count) :- compteur_hautGauche(X, B, Count).
+nbrPion_haut(X, B, Count) :- compteur_haut2(X, B, Count).
+compteur_haut(X, C, 0) :- cell(X, B), C \= B.
+compteur_haut(X, C, Count) :- haut(X,Y), cell(Y, B), C \= B,!, B \= -, compteur_haut(Y, C, Count2), Count is Count2+1.
+
+%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut à gauche
+compteur_haut2(X, C, 0) :- cell(X, B), B == C,!.
+compteur_haut2(X,_,1) :- not(haut(X,_)),!.
+compteur_haut2(X,C,Count) :- 
+    haut(X,Y),
+    compteur_haut2(Y, C, Count2),
+    case_a_compter(X, Z),
+    Count is Count2 + Z.
+
+nbrPion_hautGauche(X, B, Count) :- compteur_hautGauche2(X, B, Count).
 compteur_hautGauche(X, C, 0) :- cell(X, B), C \= B.
 compteur_hautGauche(X, C, Count) :- hautGauche(X,Y), cell(Y, B), C \= B, B \= -, compteur_hautGauche(Y, C, Count2), Count is Count2+1.
 
-nbrPion_hautDroite(X, B, Count) :- compteur_hautDroite(X, B, Count).
+%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut
+compteur_hautGauche2(X, C, 0) :- cell(X, B), B == C,!.
+compteur_hautGauche2(X,_,1) :- not(hautGauche(X,_)),!.
+compteur_hautGauche2(X,C,Count) :- 
+    hautGauche(X,Y),
+    compteur_hautGauche2(Y, C, Count2),
+    case_a_compter(X, Z),
+    Count is Count2 + Z.
+
+nbrPion_hautDroite(X, B, Count) :- compteur_hautDroite2(X, B, Count).
 compteur_hautDroite(X, C, 0) :- cell(X, B), C \= B.
 compteur_hautDroite(X, C, Count) :- hautDroite(X,Y), cell(Y, B), C \= B, B \= -, compteur_hautDroite(Y, C, Count2), Count is Count2+1.
 
-nbrPion_bas(X, B, Count) :- compteur_bas(X, B, Count).
+%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut
+compteur_hautDroite2(X, C, 0) :- cell(X, B), B == C,!.
+compteur_hautDroite2(X,_,1) :- not(hautDroite(X,_)),!.
+compteur_hautDroite2(X,C,Count) :- 
+    hautDroite(X,Y),
+    compteur_hautDroite2(Y, C, Count2),
+    case_a_compter(X, Z),
+    Count is Count2 + Z.
+
+nbrPion_bas(X, B, Count) :- compteur_bas2(X, B, Count).
 compteur_bas(X, C, 0) :- cell(X, B), C \= B.
 compteur_bas(X, C, Count) :- bas(X,Y), cell(Y, B), C \= B, B \= -, compteur_bas(Y, C, Count2), Count is Count2+1.
 
-nbrPion_basGauche(X, B, Count) :- compteur_basGauche(X, B, Count).
+%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut
+compteur_bas2(X, C, 0) :- cell(X, B), B == C,!.
+compteur_bas2(X, _, 1) :- not(bas(X,_)),!.
+compteur_bas2(X,C,Count) :- 
+    bas(X,Y),
+    compteur_bas2(Y, C, Count2),
+    case_a_compter(X, Z),
+    Count is Count2 + Z.
+
+nbrPion_basGauche(X, B, Count) :- compteur_basGauche2(X, B, Count).
 compteur_basGauche(X, C, 0) :- cell(X, B), C \= B.
 compteur_basGauche(X, C, Count) :- basGauche(X,Y), cell(Y, B), C \= B, B \= -, compteur_basGauche(Y, C, Count2), Count is Count2+1.
 
-nbrPion_basDroite(X, B, Count) :- compteur_basDroite(X, B, Count).
+%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut
+compteur_basGauche2(X, C, 0) :- cell(X, B), B == C,!.
+compteur_basGauche2(X, _, 1) :- not(basGauche(X,_)),!.
+compteur_basGauche2(X,C,Count) :- 
+    basGauche(X,Y),
+    compteur_basGauche2(Y, C, Count2),
+    case_a_compter(X, Z),
+    Count is Count2 + Z.
+
+nbrPion_basDroite(X, B, Count) :- compteur_basDroite2(X, B, Count).
 compteur_basDroite(X, C, 0) :- cell(X, B), C \= B.
 compteur_basDroite(X, C, Count) :- basDroite(X,Y), cell(Y, B), C \= B, B \= -, compteur_basDroite(Y, C, Count2), Count is Count2+1.
 
+%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut
+compteur_basDroite2(X, C, 0) :- cell(X, B), B == C,!.
+compteur_basDroite2(X, _, 1) :- not(basDroite(X,_)),!.
+compteur_basDroite2(X,C,Count) :- 
+    basDroite(X,Y),
+    compteur_basDroite2(Y, C, Count2),
+    case_a_compter(X, Z),
+    Count is Count2 + Z.
 
 /* fonction déterminant si un coup est permis */
 can_play(X, Y) :-
