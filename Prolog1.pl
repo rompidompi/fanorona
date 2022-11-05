@@ -254,30 +254,30 @@ find_best_move(Move, Score, Type):-
 %base case : la liste est vide -> retourner 0 comme valeur de BestScore.
 return_best_move([], [], 0, 0).
 return_best_move([H|T], BestMove, BestScore, Type) :-
-    get_score(H, C, Type),
+    get_score(H, C, Te),
     TempScore = C,
     TempBestMove = H,
-    TempType = Type,
+    TempType = Te,
     return_best_move(T, NewBestMove, NewBestScore, NewType),
     eval_score(TempBestMove, TempScore, TempType, NewBestMove, NewBestScore, NewType, BestMove, BestScore, Type),!.
 
 % eval_score(+score1, +score2, -BestScore)
 eval_score(Move1, Score1, Type1, _, Score2, _, Move1, Score1, Type1) :-
-    Score1 > Score2.
+    Score1 > Score2,!.
 eval_score(_, Score1, _, Move2, Score2, Type2, Move2, Score2, Type2) :-
-    Score1 < Score2.
+    Score1 < Score2,!.
 eval_score(Move1, Score1, Type1, Move2, Score2, Type2, Move, Score, Type):-
     Score1 == Score2,
     random(1,10,R),
-    get_random_move(R, Move1, Score1, Type1, Move2, Score2, Type2, Move, Score, Type).
+    get_random_move(R, Move1, Score1, Type1, Move2, Score2, Type2, Move, Score, Type),!.
 
 get_random_move(R, Move1, Score1, Type1, _, _, _, Move1, Score1, Type1):-
     R < 6,!.
 get_random_move(_, _, _, _, Move2, Score2, Type2, Move2, Score2, Type2).
     
-get_score([H|T], C, T):-
+get_score([H|T], C, Type):-
     head(T, L),!,
-    verifPion2(H, L, C, T).
+    verifPion2(H, L, C, Type).
 
 case_a_compter(X, 0) :-
     cell(X,C),
