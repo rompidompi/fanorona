@@ -386,16 +386,25 @@ show_game :-
 	L1 = [1, A1, B1, C1, D1, E1, F1, G1, H1, I1],
 	L0 = [0, a, b, c, d, e, f, g, h, i],
 
+
 	
 	nl,	
 	nl,
 	write(L5),
+        nl,
+	write('___| \\ | / | \\ | / | \\ | / | \\ | / |'),
 	nl,
 	write(L4),
 	nl,
+    	write('___| / | \\ | / | \\ | / | \\ | / | \\ |'),
+	nl,
 	write(L3),
 	nl,
+    	write('___| \\ | / | \\ | / | \\ | / | \\ | / |'),
+	nl,
 	write(L2),
+	nl,
+   	write('___| / | \\ | / | \\ | / | \\ | / | \\ |'),
 	nl,
 	write(L1),
 	nl,
@@ -405,6 +414,8 @@ show_game :-
 	write('Your opponent has played!'),
 	nl,
 	nl,
+
+
 	
 	/* On vérifie ici si la partie est terminée */
 	findall( C, cell(C, b), R ), /* On compile une liste de tout les occurences de cellules appartenant à b */
