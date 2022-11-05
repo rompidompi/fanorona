@@ -1,12 +1,5 @@
 :- dynamic cell/2.
 
-/* positionnement initial */
-%[cell(a5,b), cell(b5,b), cell(c5,b), cell(d5,b), cell(e5,b), cell(f5,b), cell(g5,b), cell(h5,b), cell(i5,b),
-% cell(a4,b), cell(b4,b), cell(c4,b), cell(d4,b), cell(e4,b), cell(f4,b), cell(g4,b), cell(h4,b), cell(i4,b),
-% cell(a3,n), cell(b3,b), cell(c3,n), cell(d3,b), cell(e3,-), cell(f3,n), cell(g3,b), cell(h3,n), cell(i3,b),
-% cell(a2,n), cell(b2,n), cell(c2,n), cell(d2,n), cell(e2,n), cell(f2,n), cell(g2,n), cell(h2,n), cell(i2,n),
-% cell(a1,n), cell(b1,n), cell(c1,n), cell(d1,n), cell(e1,n), cell(f1,n), cell(g1,n), cell(h1,n), cell(i1,n)].
-
 cell(a5,n).
 cell(b5,n).
 cell(c5,n).
@@ -52,6 +45,100 @@ cell(f1,b).
 cell(g1,b).
 cell(h1,b).
 cell(i1,b).
+
+new_game :-
+	retract( cell(a5,A) ),
+	retract( cell(b5,B) ),
+	retract( cell(c5,C) ),
+	retract( cell(d5,D) ),
+	retract( cell(e5,E) ),
+	retract( cell(f5,F) ),
+	retract( cell(g5,G) ),
+	retract( cell(h5,H) ),
+	retract( cell(i5,I) ),
+	retract( cell(a4,J) ),
+	retract( cell(b4,K) ),
+	retract( cell(c4,L) ),
+	retract( cell(d4,M) ),
+	retract( cell(e4,N) ),
+	retract( cell(f4,O) ),
+	retract( cell(g4,P) ),
+	retract( cell(h4,Q) ),
+	retract( cell(i4,R) ),
+	retract( cell(a3,S) ),
+	retract( cell(b3,T) ), 
+	retract( cell(c3,U) ), 
+	retract( cell(d3,V) ), 
+	retract( cell(e3,W) ), 
+	retract( cell(f3,X) ), 
+	retract( cell(g3,Y) ), 
+	retract( cell(h3,Z) ), 
+	retract( cell(i3,AA) ),
+	retract( cell(a2,BB) ), 
+	retract( cell(b2,CC) ), 
+	retract( cell(c2,DD) ), 
+	retract( cell(d2,EE) ), 
+	retract( cell(e2,FF) ), 
+	retract( cell(f2,GG) ), 
+	retract( cell(g2,HH) ), 
+	retract( cell(h2,II) ), 
+	retract( cell(i2,JJ) ),
+	retract( cell(a1,KK) ), 
+	retract( cell(b1,LL) ), 
+	retract( cell(c1,MM) ), 
+	retract( cell(d1,NN) ), 
+	retract( cell(e1,OO) ), 
+	retract( cell(f1,PP) ), 
+	retract( cell(g1,QQ) ),
+	retract( cell(h1,RR) ),
+	retract( cell(i1,SS) ),
+	assert( cell(a5,n) ),
+	assert( cell(b5,n) ),
+	assert( cell(c5,n) ),
+	assert( cell(d5,n) ),
+	assert( cell(e5,n) ),
+	assert( cell(f5,n) ),
+	assert( cell(g5,n) ),
+	assert( cell(h5,n) ),
+	assert( cell(i5,n) ),
+	assert( cell(a4,n) ),
+	assert( cell(b4,n) ),
+	assert( cell(c4,n) ),
+	assert( cell(d4,n) ),
+	assert( cell(e4,n) ),
+	assert( cell(f4,n) ),
+	assert( cell(g4,n) ),
+	assert( cell(h4,n) ),
+	assert( cell(i4,n) ),
+	assert( cell(a3,n) ),
+	assert( cell(b3,b) ), 
+	assert( cell(c3,n) ), 
+	assert( cell(d3,b) ), 
+	assert( cell(e3,-) ), 
+	assert( cell(f3,n) ), 
+	assert( cell(g3,b) ), 
+	assert( cell(h3,n) ), 
+	assert( cell(i3,b) ),
+	assert( cell(a2,b) ), 
+	assert( cell(b2,b) ), 
+	assert( cell(c2,b) ), 
+	assert( cell(d2,b) ), 
+	assert( cell(e2,b) ), 
+	assert( cell(f2,b) ), 
+	assert( cell(g2,b) ), 
+	assert( cell(h2,b) ), 
+	assert( cell(i2,b) ),
+	assert( cell(a1,b) ), 
+	assert( cell(b1,b) ), 
+	assert( cell(c1,b) ), 
+	assert( cell(d1,b) ), 
+	assert( cell(e1,b) ), 
+	assert( cell(f1,b) ), 
+	assert( cell(g1,b) ),
+	assert( cell(h1,b) ),
+	assert( cell(i1,b) ).
+	
+	
 
 /* Liaison des cases */
 haut(a1, a2).
@@ -166,11 +253,6 @@ droite(f5,g5).
 droite(g5,h5).
 droite(h5,i5).
 
-/* Liaison d'élimination */
-%droite_r(X, X).
-%droite_r(X, Y) :- droite(X,Z), droite_r(Z,Y), cell(X, A), cell(Y, A), cell(Z, A).
-
-
 /* Liaison inverse */
 gauche(X, Y) :- 
     droite(Y, X).
@@ -182,39 +264,12 @@ basDroite(X,Y) :-
     hautGauche(Y,X).
 	
 
-/* Liaison d'élimination */
-elim_droite(X, C) :- droite(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_droite(Y, C).
-elim_gauche(X, C) :- gauche(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_gauche(Y, C).
-elim_haut(X, C) :- haut(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_haut(Y, C).
-elim_hautGauche(X, C) :- hautGauche(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_hautGauche(Y, C).
-elim_hautDroite(X, C) :- hautDroite(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_hautDroite(Y, C).
-elim_bas(X, C) :- bas(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_bas(Y, C).
-elim_basGauche(X, C) :- basGauche(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_basGauche(Y, C).
-elim_basDroite(X, C) :- basDroite(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_basDroite(Y, C).
 
-%verif_droite(X, Y) :- droite(X,Y), cell(Y, B), not(elim_gauche(X,B)), elim_droite(Y, B). ------ Version destruction avant et arriere
-jouer_coup(X,Y) :-
-    jouer_bas(X,Y);
-    jouer_basDroite(X,Y);
-    jouer_basGauche(X,Y);
-    jouer_droite(X,Y);
-    jouer_gauche(X,Y);
-    jouer_haut(X,Y);
-    jouer_hautDroite(X,Y);
-    jouer_hautGauche(X,Y).
-
-jouer_droite(X, Y) :- droite(X,Y), cell(Y, B), elim_droite(Y, B).
-jouer_gauche(X, Y) :- gauche(X,Y), cell(Y, B), elim_gauche(Y, B).
-jouer_haut(X, Y) :- haut(X,Y), cell(Y, B), elim_haut(Y, B).
-jouer_hautGauche(X, Y) :- hautGauche(X,Y), cell(Y, B), elim_hautGauche(Y, B).
-jouer_hautDroite(X, Y) :- hautDroite(X,Y), cell(Y, B), elim_hautDroite(Y, B).
-jouer_bas(X, Y) :- bas(X,Y), cell(Y, B), elim_bas(Y, B).
-jouer_basGauche(X, Y) :- basGauche(X,Y), cell(Y, B), elim_basGauche(Y, B).
-jouer_basDroite(X, Y) :- basDroite(X,Y), cell(Y, B), elim_basDroite(Y, B).
 
 
 /* Boucle pour déterminer nombre de pions adverses */
 verifPion(X, Y, C) :- 
+<<<<<<< Updated upstream
     verifPion_droite(X, Y, C);
     verifPion_bas(X, Y, C);
     verifPion_basDroite(X, Y, C);
@@ -225,6 +280,73 @@ verifPion(X, Y, C) :-
     verifPion_hautGauche(X, Y, C).
 
 
+=======
+    verifPion_droite(X, Y, C),!;
+    verifPion_bas(X, Y, C),!;
+    verifPion_basDroite(X, Y, C),!;
+    verifPion_basGauche(X, Y, C),!;
+    verifPion_gauche(X, Y, C),!;
+    verifPion_haut(X, Y, C),!;
+    verifPion_hautDroite(X, Y, C),!;
+    verifPion_hautGauche(X, Y, C),!.
+/* Boucle pour déterminer nombre de pions adverses avec aspiration-collision */
+verifPion2(X, Y, C, T) :- 
+    verifPion_droite2(X, Y, C, T),!;
+    verifPion_bas2(X, Y, C, T),!;
+    verifPion_basDroite2(X, Y, C, T),!;
+    verifPion_basGauche2(X, Y, C, T),!;
+    verifPion_gauche2(X, Y, C, T),!;
+    verifPion_haut2(X, Y, C, T),!;
+    verifPion_hautDroite2(X, Y, C, T),!;
+    verifPion_hautGauche2(X, Y, C, T),!.
+
+head([H|_], H).
+
+find_best_move(Move, Score, Type):-
+	find_all_playable_moves(Moves),
+    return_best_move(Moves, Move, Score, Type).
+
+%base case : la liste est vide -> retourner 0 comme valeur de BestScore.
+return_best_move([], [], 0, 0).
+return_best_move([H|T], BestMove, BestScore, Type) :-
+    get_score(H, C, Te),
+    TempScore = C,
+    TempBestMove = H,
+    TempType = Te,
+    return_best_move(T, NewBestMove, NewBestScore, NewType),
+    eval_score(TempBestMove, TempScore, TempType, NewBestMove, NewBestScore, NewType, BestMove, BestScore, Type),!.
+
+% eval_score(+score1, +score2, -BestScore)
+eval_score(Move1, Score1, Type1, _, Score2, _, Move1, Score1, Type1) :-
+    Score1 > Score2,!.
+eval_score(_, Score1, _, Move2, Score2, Type2, Move2, Score2, Type2) :-
+    Score1 < Score2,!.
+eval_score(Move1, Score1, Type1, Move2, Score2, Type2, Move, Score, Type):-
+    Score1 == Score2,
+    random(1,10,R),
+    get_random_move(R, Move1, Score1, Type1, Move2, Score2, Type2, Move, Score, Type),!.
+
+get_random_move(R, Move1, Score1, Type1, _, _, _, Move1, Score1, Type1):-
+    R < 6,!.
+get_random_move(_, _, _, _, Move2, Score2, Type2, Move2, Score2, Type2).
+    
+get_score([H|T], C, Type):-
+    head(T, L),!,
+    verifPion2(H, L, C, Type).
+
+case_a_compter(X, 0) :-
+    cell(X,C),
+    C == -,!.
+case_a_compter(X, 1) :-
+    cell(X,C),
+    C \= -,!.
+
+eval_aspiration_vs_collision(C1, C2, C1,c) :-
+    C1 >= C2.
+eval_aspiration_vs_collision(C1,C2,C2,a) :-
+    C2 > C1.
+    
+>>>>>>> Stashed changes
 verifPion_droite(X,Y,C) :- droite(X,Y), cell(X, B), nbrPion_droite(Y, B, C).
 verifPion_haut(X,Y,C) :- haut(X,Y), cell(X, B), nbrPion_haut(Y, B, C).
 verifPion_gauche(X,Y,C) :- gauche(X,Y), cell(X, B), nbrPion_gauche(Y, B, C).
@@ -234,6 +356,7 @@ verifPion_bas(X,Y,C) :- bas(X,Y), cell(X, B), nbrPion_bas(Y, B, C).
 verifPion_basGauche(X,Y,C) :- basGauche(X,Y), cell(X, B), nbrPion_basGauche(Y, B, C).
 verifPion_basDroite(X,Y,C) :- basDroite(X,Y), cell(X, B), nbrPion_basDroite(Y, B, C).
 
+<<<<<<< Updated upstream
 
 nbrPion_droite(X, B, Count) :- compteur_droite(X, B, Count).
 compteur_droite(X, C, 0) :- cell(X, B), C \= B.
@@ -267,6 +390,153 @@ nbrPion_basDroite(X, B, Count) :- compteur_basDroite(X, B, Count).
 compteur_basDroite(X, C, 0) :- cell(X, B), C \= B.
 compteur_basDroite(X, C, Count) :- basDroite(X,Y), cell(Y, B), C \= B, B \= -, compteur_basDroite(Y, C, Count2), Count is Count2+1.
 
+=======
+verifPion_droite2(X,Y,C,T) :-
+    droite(X,Y), cell(X,B), gauche(X,Z), 
+    nbrPion_droite(Y,B,C1), nbrPion_gauche(Z,B,C2),
+    eval_aspiration_vs_collision(C1,C2,C,T),!.
+verifPion_droite2(X,Y,C,c) :-
+    droite(X,Y), cell(X,B), nbrPion_droite(Y,B,C),!.
+%verifPion_droite2(X,_,C,a) :-
+    %gauche(X,Z), cell(X,B), nbrPion_gauche(Z,B,C),!.
+
+verifPion_haut2(X,Y,C,T) :- 
+    haut(X,Y), bas(X,Z), cell(X, B), 
+    nbrPion_haut(Y, B, C1), nbrPion_bas(Z,B,C2),
+    eval_aspiration_vs_collision(C1,C2,C,T),!.
+verifPion_haut2(X,Y,C,c) :- haut(X,Y), cell(X, B), nbrPion_haut(Y, B, C),!. 
+%verifPion_haut2(X,_,C,a) :- bas(X,Z), cell(X, B), nbrPion_bas(Z,B,C),!.
+
+verifPion_gauche2(X,Y,C,T) :- 
+    gauche(X,Y), droite(X,Z), cell(X, B), 
+    nbrPion_gauche(Y, B, C1), nbrPion_droite(Z,B,C2),
+    eval_aspiration_vs_collision(C1,C2,C,T),!.
+verifPion_gauche2(X,Y,C,c) :- gauche(X,Y), cell(X, B), nbrPion_gauche(Y, B, C),!.
+%verifPion_gauche2(X,_,C,a) :- droite(X,Z), cell(X, B), nbrPion_droite(Z,B,C),!.
+
+verifPion_hautGauche2(X,Y,C,T) :-
+    hautGauche(X,Y), basDroite(X,Z), cell(X, B), 
+    nbrPion_hautGauche(Y, B, C1), nbrPion_basDroite(Z,B,C2), 
+    eval_aspiration_vs_collision(C1,C2,C,T),!.
+verifPion_hautGauche2(X,Y,C,c) :- hautGauche(X,Y), cell(X, B), nbrPion_hautGauche(Y, B, C),!.
+%verifPion_hautGauche2(X,_,C,a) :- basDroite(X,Z), cell(X, B), nbrPion_basDroite(Z,B,C),!.
+
+verifPion_hautDroite2(X,Y,C,T) :-
+    hautDroite(X,Y), basGauche(X,Z), cell(X, B), 
+    nbrPion_hautDroite(Y, B, C1), nbrPion_basGauche(Z,B,C2), 
+    eval_aspiration_vs_collision(C1,C2,C,T),!.
+verifPion_hautDroite2(X,Y,C,c) :- hautDroite(X,Y), cell(X, B), nbrPion_hautDroite(Y, B, C),!.
+%verifPion_hautDroite2(X,_,C,a) :- basGauche(X,Z), cell(X, B), nbrPion_basGauche(Z,B,C),!.
+
+verifPion_bas2(X,Y,C,T) :-
+    bas(X,Y), haut(X,Z), cell(X, B), 
+    nbrPion_bas(Y, B, C1), nbrPion_haut(Z,B,C2), 
+    eval_aspiration_vs_collision(C1,C2,C,T),!.
+verifPion_bas2(X,Y,C,c) :- bas(X,Y), cell(X, B), nbrPion_bas(Y, B, C),!.
+%verifPion_bas2(X,_,C,a) :- haut(X,Z), cell(X, B), nbrPion_haut(Z,B,C),!. 
+
+verifPion_basGauche2(X,Y,C,T) :-
+    basGauche(X,Y), hautDroite(X,Z), cell(X, B), 
+    nbrPion_basGauche(Y, B, C1), nbrPion_hautDroite(Z,B,C2), 
+    eval_aspiration_vs_collision(C1,C2,C,T),!.
+verifPion_basGauche2(X,Y,C,c) :- basGauche(X,Y), cell(X, B), nbrPion_basGauche(Y, B, C),!.
+%verifPion_basGauche2(X,_,C,a) :- hautDroite(X,Z), cell(X, B), nbrPion_hautDroite(Z,B,C),!. 
+
+verifPion_basDroite2(X,Y,C,T) :-
+    basDroite(X,Y), hautGauche(X,Z), cell(X, B), 
+    nbrPion_basDroite(Y, B, C1), nbrPion_hautGauche(Z,B,C2), 
+    eval_aspiration_vs_collision(C1,C2,C,T),!.
+verifPion_basDroite2(X,Y,C,c) :- basDroite(X,Y), cell(X, B), nbrPion_basDroite(Y, B, C),!.
+%verifPion_basDroite2(X,_,C,a) :- hautGauche(X,Z), cell(X, B), nbrPion_hautGauche(Z,B,C),!.
+
+nbrPion_droite(X, B, Count) :- compteur_droite2(X, B, Count),!.
+%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases à gauche
+compteur_droite2(X, C, 0) :- cell(X, B), B == C,!.
+compteur_droite2(X, _, 1) :- not(droite(X,_)),!.
+compteur_droite2(X,_,0):- droite(X,Y), cell(Y,-),!. 
+compteur_droite2(X,C,Count) :- 
+    droite(X,Y),
+    compteur_droite2(Y, C, Count2),
+    case_a_compter(X, Z),
+    Count is Count2 + Z.
+
+nbrPion_gauche(X, B, Count) :- compteur_gauche2(X, B, Count),!.
+%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases à gauche
+compteur_gauche2(X, C, 0) :- cell(X, B), B == C,!.
+compteur_gauche2(X, _, 1) :- not(gauche(X,_)),!.
+compteur_gauche2(X,_,0):- gauche(X,Y), cell(Y,-),!.
+compteur_gauche2(X,C,Count) :- 
+    gauche(X,Y),
+    compteur_gauche2(Y, C, Count2),
+    case_a_compter(X, Z),
+    Count is Count2 + Z.
+
+nbrPion_haut(X, B, Count) :- compteur_haut2(X, B, Count).
+%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut à gauche
+compteur_haut2(X, C, 0) :- cell(X, B), B == C,!.
+compteur_haut2(X,_,1) :- not(haut(X,_)),!.
+compteur_haut2(X,_,0):- haut(X,Y), cell(Y,-),!. 
+compteur_haut2(X,C,Count) :- 
+    haut(X,Y),
+    compteur_haut2(Y, C, Count2),
+    case_a_compter(X, Z),
+    Count is Count2 + Z.
+
+nbrPion_hautGauche(X, B, Count) :- compteur_hautGauche2(X, B, Count).
+%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut
+compteur_hautGauche2(X, C, 0) :- cell(X, B), B == C,!.
+compteur_hautGauche2(X,_,1) :- not(hautGauche(X,_)),!.
+compteur_hautGauche2(X,_,0):- hautGauche(X,Y), cell(Y,-),!. 
+compteur_hautGauche2(X,C,Count) :- 
+    hautGauche(X,Y),
+    compteur_hautGauche2(Y, C, Count2),
+    case_a_compter(X, Z),
+    Count is Count2 + Z.
+
+nbrPion_hautDroite(X, B, Count) :- compteur_hautDroite2(X, B, Count).
+%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut
+compteur_hautDroite2(X, C, 0) :- cell(X, B), B == C,!.
+compteur_hautDroite2(X,_,1) :- not(hautDroite(X,_)),!.
+compteur_hautDroite2(X,_,0):- hautDroite(X,Y), cell(Y,-),!. 
+compteur_hautDroite2(X,C,Count) :- 
+    hautDroite(X,Y),
+    compteur_hautDroite2(Y, C, Count2),
+    case_a_compter(X, Z),
+    Count is Count2 + Z.
+
+nbrPion_bas(X, B, Count) :- compteur_bas2(X, B, Count).
+%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut
+compteur_bas2(X, C, 0) :- cell(X, B), B == C,!.
+compteur_bas2(X, _, 1) :- not(bas(X,_)),!.
+compteur_bas2(X,_,0):- bas(X,Y), cell(Y,-),!. 
+compteur_bas2(X,C,Count) :- 
+    bas(X,Y),
+    compteur_bas2(Y, C, Count2),
+    case_a_compter(X, Z),
+    Count is Count2 + Z.
+
+nbrPion_basGauche(X, B, Count) :- compteur_basGauche2(X, B, Count).
+%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut
+compteur_basGauche2(X, C, 0) :- cell(X, B), B == C,!.
+compteur_basGauche2(X, _, 1) :- not(basGauche(X,_)),!.
+compteur_basGauche2(X,_,0):- basGauche(X,Y), cell(Y,-),!. 
+compteur_basGauche2(X,C,Count) :- 
+    basGauche(X,Y),
+    compteur_basGauche2(Y, C, Count2),
+    case_a_compter(X, Z),
+    Count is Count2 + Z.
+
+nbrPion_basDroite(X, B, Count) :- compteur_basDroite2(X, B, Count).
+%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut
+compteur_basDroite2(X, C, 0) :- cell(X, B), B == C,!.
+compteur_basDroite2(X, _, 1) :- not(basDroite(X,_)),!.
+compteur_basDroite2(X,_,0):- basDroite(X,Y), cell(Y,-),!. 
+compteur_basDroite2(X,C,Count) :- 
+    basDroite(X,Y),
+    compteur_basDroite2(Y, C, Count2),
+    case_a_compter(X, Z),
+    Count is Count2 + Z.
+>>>>>>> Stashed changes
 
 /* fonction déterminant si un coup est permis */
 can_play(X, Y) :-
@@ -300,25 +570,76 @@ can_playComp(X, Y) :-
 eliminate(X, A) :-
 	retract( cell(X, A) ),
 	assert( cell(X, -) ).
+	
+/* Liaison d'élimination */
+elim_droite(X, C) :- droite(X,Y), cell(Y, B), C \= B, B \= -, eliminate(Y, B), elim_droite(Y, C).
+elim_gauche(X, C) :- gauche(X,Y), cell(Y, B), C \= B, B \= -, eliminate(Y, B), elim_gauche(Y, C).
+elim_haut(X, C) :- haut(X,Y), cell(Y, B), C \= B, B \= -, eliminate(Y, B), elim_haut(Y, C).
+elim_hautGauche(X, C) :- hautGauche(X,Y), cell(Y, B), C \= B, B \= -, eliminate(Y, B), elim_hautGauche(Y, C).
+elim_hautDroite(X, C) :- hautDroite(X,Y), cell(Y, B), C \= B, B \= -, eliminate(Y, B), elim_hautDroite(Y, C).
+elim_bas(X, C) :- bas(X,Y), cell(Y, B), C \= B, B \= -, eliminate(Y, B), elim_bas(Y, C).
+elim_basGauche(X, C) :- basGauche(X,Y), cell(Y, B), C \= B, B \= -, eliminate(Y, B), elim_basGauche(Y, C).
+elim_basDroite(X, C) :- basDroite(X,Y), cell(Y, B), C \= B, B \= -, eliminate(Y, B), elim_basDroite(Y, C).
+
+%verif_droite(X, Y) :- droite(X,Y), cell(Y, B), not(elim_gauche(X,B)), elim_droite(Y, B). ------ Version destruction avant et arriere
+jouer_coup(X,Y) :-
+    jouer_bas(X,Y);
+    jouer_basDroite(X,Y);
+    jouer_basGauche(X,Y);
+    jouer_droite(X,Y);
+    jouer_gauche(X,Y);
+    jouer_haut(X,Y);
+    jouer_hautDroite(X,Y);
+    jouer_hautGauche(X,Y).
+
+jouer_droite(X, Y) :- droite(X,Y), cell(Y, B), elim_droite(Y, B).
+jouer_gauche(X, Y) :- gauche(X,Y), cell(Y, B), elim_gauche(Y, B).
+jouer_haut(X, Y) :- haut(X,Y), cell(Y, B), elim_haut(Y, B).
+jouer_hautGauche(X, Y) :- hautGauche(X,Y), cell(Y, B), elim_hautGauche(Y, B).
+jouer_hautDroite(X, Y) :- hautDroite(X,Y), cell(Y, B), elim_hautDroite(Y, B).
+jouer_bas(X, Y) :- bas(X,Y), cell(Y, B), elim_bas(Y, B).
+jouer_basGauche(X, Y) :- basGauche(X,Y), cell(Y, B), elim_basGauche(Y, B).
+jouer_basDroite(X, Y) :- basDroite(X,Y), cell(Y, B), elim_basDroite(Y, B).
+
+destruction(X,Y,c) :-
+	retract( cell(X, H) ),
+	assert( cell(X, -) ),
+	retract( cell(Y, -) ),
+	assert( cell(Y, H) ),
+	not(jouer_coup(X,Y)).
+	
+destruction(X,Y,a) :-
+	not(jouer_coup(Y, X)),
+	retract( cell(X, H) ),
+	assert( cell(X, -) ),
+	retract( cell(Y, -) ),
+	assert( cell(Y, H) ).
 
 /* fonctions d'action dans le jeu */
 play(X, Y) :-	
 	can_play(X,Y),
-
-	retract( cell(X, b) ),
-	assert( cell(X, -) ),
-	retract( cell(Y, -) ),
-	assert( cell(Y, b) ),
-
-	not(jouer_coup(X,Y)),
-	show_game.
+	(not(verifPion2(X, Y, C, T))); (verifPion2(X, Y, C, T)),
+	destruction(X,Y,T),
+	not(show_game),
+	find_best_move(Move, Score, Type),
+	nl,
+	nl,
+	write(Move),
+	nl,
+	write(Score),
+	nl,
+	write(Type),
+	nl,
+	nl,
+	Move = [H|D],
+	D = [Z|_],
+	play_comp(H,Z).
 		
 play_comp(X, Y) :-	
 	can_playComp(X, Y),
-	retract( cell(X, n) ),
-	assert( cell(X, -) ),
-	retract( cell(Y, -) ),
-	assert( cell(Y, n) ),
+	(not(verifPion2(X, Y, C, T))); (verifPion2(X, Y, C, T)),
+	write(X + Y + T),
+	destruction(X,Y,T),
 	show_game.
 	
 /* fonctions d'affichage du jeu */
@@ -379,32 +700,42 @@ show_game :-
 	cell(h5, H5), 
 	cell(i5, I5),
 
-	L5 = [5, A5, B5, C5, D5, E5, F5, G5, H5, I5],
-	L4 = [4, A4, B4, C4, D4, E4, F4, G4, H4, I4],
-	L3 = [3, A3, B3, C3, D3, E3, F3, G3, H3, I3],
-	L2 = [2, A2, B2, C2, D2, E2, F2, G2, H2, I2],
-	L1 = [1, A1, B1, C1, D1, E1, F1, G1, H1, I1],
-	L0 = [0, a, b, c, d, e, f, g, h, i],
+	L5 = ["5| ", A5, -, B5, -, C5, -, D5, -, E5, -, F5, -, G5, -, H5, -, I5],
+	L4 = ["4| ", A4, -, B4, -, C4, -, D4, -, E4, -, F4, -, G4, -, H4, -, I4],
+	L3 = ["3| ", A3, -, B3, -, C3, -, D3, -, E3, -, F3, -, G3, -, H3, -, I3],
+	L2 = ["2| ", A2, -, B2, -, C2, -, D2, -, E2, -, F2, -, G2, -, H2, -, I2],
+	L1 = ["1| ", A1, -, B1, -, C1, -, D1, -, E1, -, F1, -, G1, -, H1, -, I1],
+	L0 = ["0  ", "A",  -, "B",  -, "C",  -, "D",  -, "E",  -, "F",  -, "G",  -, "H",  -, "I"],
 
-	
 	nl,	
 	nl,
 	write(L5),
 	nl,
+	ansi_format([bold,fg(green)], '~w', ['  |  | \\ | / | \\ | / | \\ | / | \\ | / |']),
+	nl,
 	write(L4),
+	nl,
+	ansi_format([bold,fg(green)], '~w', ['  |  | / | \\ | / | \\ | / | \\ | / | \\ |']),
 	nl,
 	write(L3),
 	nl,
+	ansi_format([bold,fg(green)], '~w', ['  |  | \\ | / | \\ | / | \\ | / | \\ | / |']),
+	nl,
 	write(L2),
 	nl,
+	ansi_format([bold,fg(green)], '~w', ['  |  | / | \\ | / | \\ | / | \\ | / | \\ |']),
+	nl,
 	write(L1),
+	nl,
+	write('  |____________________________________'),
 	nl,
 	write(L0),
 	nl,
 	nl,
 	write('Your opponent has played!'),
+	nl,	
 	nl,
-	nl,
+	
 	
 	/* On vérifie ici si la partie est terminée */
 	findall( C, cell(C, b), R ), /* On compile une liste de tout les occurences de cellules appartenant à b */
@@ -420,6 +751,8 @@ show_game :-
 	(F =:= 0), /* Cette condition affichera false si vous avez perdu */
 	nl,
 	write('True').
+	
+	
 
 	
 		
