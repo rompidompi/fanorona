@@ -7,17 +7,17 @@
 % cell(a2,n), cell(b2,n), cell(c2,n), cell(d2,n), cell(e2,n), cell(f2,n), cell(g2,n), cell(h2,n), cell(i2,n),
 % cell(a1,n), cell(b1,n), cell(c1,n), cell(d1,n), cell(e1,n), cell(f1,n), cell(g1,n), cell(h1,n), cell(i1,n)].
 
-cell(a5,n).
+cell(a5,b).
 cell(b5,n).
 cell(c5,n).
 cell(d5,n).
 cell(e5,-).
 cell(f5,n).
-cell(g5,-).
+cell(g5,n).
 cell(h5,n).
 cell(i5,n).
 cell(a4,n).
-cell(b4,n).
+cell(b4,-).
 cell(c4,n).
 cell(d4,n).
 cell(e4,-).
@@ -31,13 +31,13 @@ cell(c3,n).
 cell(d3,b). 
 cell(e3,b). 
 cell(f3,n). 
-cell(g3,n). 
+cell(g3,b). 
 cell(h3,n). 
 cell(i3,b).
 cell(a2,b). 
 cell(b2,b). 
 cell(c2,b). 
-cell(d2,n). 
+cell(d2,b). 
 cell(e2,-). 
 cell(f2,b). 
 cell(g2,b). 
@@ -312,6 +312,9 @@ verifPion_haut2(X,Y,C,T) :-
     haut(X,Y), bas(X,_), cell(X, B), haut(Y,Z), 
     nbrPion_haut(Z, B, C1), nbrPion_basAspiration(X,B,C2),
     eval_aspiration_vs_collision(C1,C2,C,T),!.
+verifPion_haut2(X,Y,C,a) :-
+    haut(X,Y), bas(X,_), cell(X, B),
+    nbrPion_basAspiration(X,B,C),!. 
 verifPion_haut2(X,Y,C,c) :- haut(X,Y), cell(X, B), nbrPion_haut(Y, B, C),!. 
 %verifPion_haut2(X,_,C,a) :- bas(X,Z), cell(X, B), nbrPion_bas(Z,B,C),!.
 
@@ -319,6 +322,9 @@ verifPion_gauche2(X,Y,C,T) :-
     gauche(X,Y), droite(X,_), cell(X, B), gauche(Y,Z),
     nbrPion_gauche(Z, B, C1), nbrPion_droiteAspiration(X,B,C2),
     eval_aspiration_vs_collision(C1,C2,C,T),!.
+verifPion_gauche2(X,Y,C,a) :- 
+    gauche(X,Y), droite(X,_), cell(X, B),
+    nbrPion_droiteAspiration(X,B,C),!. 
 verifPion_gauche2(X,Y,C,c) :- gauche(X,Y), cell(X, B), nbrPion_gauche(Y, B, C),!.
 %verifPion_gauche2(X,_,C,a) :- droite(X,Z), cell(X, B), nbrPion_droite(Z,B,C),!.
 
@@ -326,6 +332,9 @@ verifPion_hautGauche2(X,Y,C,T) :-
     hautGauche(X,Y), basDroite(X,_), cell(X, B), hautGauche(Y,Z),
     nbrPion_hautGauche(Z, B, C1), nbrPion_basDroiteAspiration(X,B,C2), 
     eval_aspiration_vs_collision(C1,C2,C,T),!.
+verifPion_hautGauche2(X,Y,C,a) :-
+    hautGauche(X,Y), basDroite(X,_), cell(X, B),
+    nbrPion_basDroiteAspiration(X,B,C),!. 
 verifPion_hautGauche2(X,Y,C,c) :- hautGauche(X,Y), cell(X, B), nbrPion_hautGauche(Y, B, C),!.
 %verifPion_hautGauche2(X,_,C,a) :- basDroite(X,Z), cell(X, B), nbrPion_basDroite(Z,B,C),!.
 
@@ -333,6 +342,9 @@ verifPion_hautDroite2(X,Y,C,T) :-
     hautDroite(X,Y), basGauche(X,_), cell(X, B), hautDroite(Y,Z),
     nbrPion_hautDroite(Z, B, C1), nbrPion_basGaucheAspiration(X,B,C2), 
     eval_aspiration_vs_collision(C1,C2,C,T),!.
+verifPion_hautDroite2(X,Y,C,a) :-    
+    hautDroite(X,Y), basGauche(X,_), cell(X, B),
+    nbrPion_basGaucheAspiration(X,B,C),!. 
 verifPion_hautDroite2(X,Y,C,c) :- hautDroite(X,Y), cell(X, B), nbrPion_hautDroite(Y, B, C),!.
 %verifPion_hautDroite2(X,_,C,a) :- basGauche(X,Z), cell(X, B), nbrPion_basGauche(Z,B,C),!.
 
@@ -340,6 +352,9 @@ verifPion_bas2(X,Y,C,T) :-
     bas(X,Y), haut(X,_), cell(X, B), bas(Y,Z),
     nbrPion_bas(Z, B, C1), nbrPion_hautAspiration(X,B,C2), 
     eval_aspiration_vs_collision(C1,C2,C,T),!.
+verifPion_bas2(X,Y,C,a) :-    
+    bas(X,Y), haut(X,_), cell(X, B),
+    nbrPion_hautAspiration(X,B,C),!. 
 verifPion_bas2(X,Y,C,c) :- bas(X,Y), cell(X, B), nbrPion_bas(Y, B, C),!.
 %verifPion_bas2(X,_,C,a) :- haut(X,Z), cell(X, B), nbrPion_haut(Z,B,C),!. 
 
@@ -347,6 +362,9 @@ verifPion_basGauche2(X,Y,C,T) :-
     basGauche(X,Y), hautDroite(X,_), cell(X, B), basGauche(Y,Z),
     nbrPion_basGauche(Z, B, C1), nbrPion_hautDroiteAspiration(X,B,C2), 
     eval_aspiration_vs_collision(C1,C2,C,T),!.
+verifPion_basGauche2(X,Y,C,a) :-    
+    basGauche(X,Y), hautDroite(X,_), cell(X, B),
+    nbrPion_hautDroiteAspiration(X,B,C),!. 
 verifPion_basGauche2(X,Y,C,c) :- basGauche(X,Y), cell(X, B), nbrPion_basGauche(Y, B, C),!.
 %verifPion_basGauche2(X,_,C,a) :- hautDroite(X,Z), cell(X, B), nbrPion_hautDroite(Z,B,C),!. 
 
@@ -354,6 +372,9 @@ verifPion_basDroite2(X,Y,C,T) :-
     basDroite(X,Y), hautGauche(X,_), cell(X, B), basDroite(Y,Z),
     nbrPion_basDroite(Z, B, C1), nbrPion_hautGaucheAspiration(X,B,C2), 
     eval_aspiration_vs_collision(C1,C2,C,T),!.
+verifPion_basDroite2(X,Y,C,a) :-    
+    basDroite(X,Y), hautGauche(X,_), cell(X, B),
+    nbrPion_hautGaucheAspiration(X,B,C),!. 
 verifPion_basDroite2(X,Y,C,c) :- basDroite(X,Y), cell(X, B), nbrPion_basDroite(Y, B, C),!.
 %verifPion_basDroite2(X,_,C,a) :- hautGauche(X,Z), cell(X, B), nbrPion_hautGauche(Z,B,C),!.
 
