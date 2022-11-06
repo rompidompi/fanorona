@@ -356,7 +356,7 @@ compteur_haut(Y,C,Count) :-
 nbrPion_haut_ParAspiration(X,_,0) :- not(bas(X,_)),!.
 nbrPion_haut_ParAspiration(X,_,0) :- bas(X,Z), cell(Z,B), B == -,!.
 nbrPion_haut_ParAspiration(X,C,0) :- bas(X,Z), cell(Z,B), B == C,!.
-nbrPion_haut_ParAspiration(X,C,Count) :- bas(X,Y), compteur_bas_aspiration(Y,C,Count).
+nbrPion_haut_ParAspiration(X,C,Count) :- bas(X,Y), compteur_haut_aspiration(Y,C,Count).
 
 compteur_haut_aspiration(X,C,0) :- cell(X,B), B == C,!.
 compteur_haut_aspiration(X,_,1) :- bas(X,Z), cell(Z,B), B == -,!.
@@ -390,7 +390,7 @@ compteur_droite(Y,C,Count) :-
 nbrPion_droite_ParAspiration(X,_,0) :- not(gauche(X,_)),!.
 nbrPion_droite_ParAspiration(X,_,0) :- gauche(X,Z), cell(Z,B), B == -,!.
 nbrPion_droite_ParAspiration(X,C,0) :- gauche(X,Z), cell(Z,B), B == C,!.
-nbrPion_droite_ParAspiration(X,C,Count) :- gauche(X,Y), compteur_gauche_aspiration(Y,C,Count).
+nbrPion_droite_ParAspiration(X,C,Count) :- gauche(X,Y), compteur_droite_aspiration(Y,C,Count).
 
 compteur_droite_aspiration(X,C,0) :- cell(X,B), B == C,!.
 compteur_droite_aspiration(X,_,1) :- gauche(X,Z), cell(Z,B), B == -,!.
@@ -405,7 +405,7 @@ compteur_droite_aspiration(X,C,Count) :-
 
 verifPion_gauche2(X,Y,C,T) :- 
     cell(X, B),
-    nbrPion_gauche2(Y, B, C1), nbrPion_droite_ParAspiration(X,B,C2),
+    nbrPion_gauche2(Y, B, C1), nbrPion_gauche_ParAspiration(X,B,C2),
     eval_aspiration_vs_collision(C1,C2,C,T),!.
 
 nbrPion_gauche2(Y,_,0) :- not(gauche(Y,_)),!.
@@ -425,7 +425,7 @@ compteur_gauche(Y,C,Count) :-
 nbrPion_gauche_ParAspiration(X,_,0) :- not(droite(X,_)),!.
 nbrPion_gauche_ParAspiration(X,_,0) :- droite(X,Z), cell(Z,B), B == -,!.
 nbrPion_gauche_ParAspiration(X,C,0) :- droite(X,Z), cell(Z,B), B == C,!.
-nbrPion_gauche_ParAspiration(X,C,Count) :- droite(X,Y), compteur_droite_aspiration(Y,C,Count).
+nbrPion_gauche_ParAspiration(X,C,Count) :- droite(X,Y), compteur_gauche_aspiration(Y,C,Count).
 
 compteur_gauche_aspiration(X,C,0) :- cell(X,B), B == C,!.
 compteur_gauche_aspiration(X,_,1) :- droite(X,Z), cell(Z,B), B == -,!.
@@ -439,7 +439,7 @@ compteur_gauche_aspiration(X,C,Count) :-
 
 verifPion_bas2(X,Y,C,T) :- 
     cell(X, B),
-    nbrPion_bas2(Y, B, C1), nbrPion_haut_ParAspiration(X,B,C2),
+    nbrPion_bas2(Y, B, C1), nbrPion_bas_ParAspiration(X,B,C2),
     eval_aspiration_vs_collision(C1,C2,C,T),!.
 
 nbrPion_bas2(Y,_,0) :- not(bas(Y,_)),!.
@@ -459,7 +459,7 @@ compteur_bas(Y,C,Count) :-
 nbrPion_bas_ParAspiration(X,_,0) :- not(haut(X,_)),!.
 nbrPion_bas_ParAspiration(X,_,0) :- haut(X,Z), cell(Z,B), B == -,!.
 nbrPion_bas_ParAspiration(X,C,0) :- haut(X,Z), cell(Z,B), B == C,!.
-nbrPion_bas_ParAspiration(X,C,Count) :- haut(X,Y), compteur_haut_aspiration(Y,C,Count).
+nbrPion_bas_ParAspiration(X,C,Count) :- haut(X,Y), compteur_bas_aspiration(Y,C,Count).
 
 compteur_bas_aspiration(X,C,0) :- cell(X,B), B == C,!.
 compteur_bas_aspiration(X,_,1) :- haut(X,Z), cell(Z,B), B == -,!.
@@ -475,7 +475,7 @@ compteur_bas_aspiration(X,C,Count) :-
 
 verifPion_basGauche2(X,Y,C,T) :- 
     cell(X, B),
-    nbrPion_basGauche2(Y, B, C1), nbrPion_hautDroite_ParAspiration(X,B,C2),
+    nbrPion_basGauche2(Y, B, C1), nbrPion_basGauche_ParAspiration(X,B,C2),
     eval_aspiration_vs_collision(C1,C2,C,T),!.
 
 nbrPion_basGauche2(Y,_,0) :- not(basGauche(Y,_)),!.
@@ -496,7 +496,7 @@ compteur_basGauche(Y,C,Count) :-
 nbrPion_basGauche_ParAspiration(X,_,0) :- not(hautDroite(X,_)),!.
 nbrPion_basGauche_ParAspiration(X,_,0) :- hautDroite(X,Z), cell(Z,B), B == -,!.
 nbrPion_basGauche_ParAspiration(X,C,0) :- hautDroite(X,Z), cell(Z,B), B == C,!.
-nbrPion_basGauche_ParAspiration(X,C,Count) :- hautDroite(X,Y), compteur_hautDroite_aspiration(Y,C,Count).
+nbrPion_basGauche_ParAspiration(X,C,Count) :- hautDroite(X,Y), compteur_basGauche_aspiration(Y,C,Count).
 
 compteur_basGauche_aspiration(X,C,0) :- cell(X,B), B == C,!.
 compteur_basGauche_aspiration(X,_,1) :- hautDroite(X,Z), cell(Z,B), B == -,!.
@@ -510,7 +510,7 @@ compteur_basGauche_aspiration(X,C,Count) :-
 
 verifPion_basDroite2(X,Y,C,T) :- 
     cell(X, B),
-    nbrPion_basDroite2(Y, B, C1), nbrPion_hautGauche_ParAspiration(X,B,C2),
+    nbrPion_basDroite2(Y, B, C1), nbrPion_basDroite_ParAspiration(X,B,C2),
     eval_aspiration_vs_collision(C1,C2,C,T),!.
 
 nbrPion_basDroite2(Y,_,0) :- not(basDroite(Y,_)),!.
@@ -530,7 +530,7 @@ compteur_basDroite(Y,C,Count) :-
 nbrPion_basDroite_ParAspiration(X,_,0) :- not(hautGauche(X,_)),!.
 nbrPion_basDroite_ParAspiration(X,_,0) :- hautGauche(X,Z), cell(Z,B), B == -,!.
 nbrPion_basDroite_ParAspiration(X,C,0) :- hautGauche(X,Z), cell(Z,B), B == C,!.
-nbrPion_basDroite_ParAspiration(X,C,Count) :- hautGauche(X,Y), compteur_hautGauche_aspiration(Y,C,Count).
+nbrPion_basDroite_ParAspiration(X,C,Count) :- hautGauche(X,Y), compteur_basDroite_aspiration(Y,C,Count).
 
 compteur_basDroite_aspiration(X,C,0) :- cell(X,B), B == C,!.
 compteur_basDroite_aspiration(X,_,1) :- hautGauche(X,Z), cell(Z,B), B == -,!.
@@ -545,7 +545,7 @@ compteur_basDroite_aspiration(X,C,Count) :-
 
 verifPion_hautDroite2(X,Y,C,T) :- 
     cell(X, B),
-    nbrPion_haut2(Y, B, C1), nbrPion_basGauche_ParAspiration(X,B,C2),
+    nbrPion_hautDroite2(Y, B, C1), nbrPion_hautDroite_ParAspiration(X,B,C2),
     eval_aspiration_vs_collision(C1,C2,C,T),!.
 
 nbrPion_hautDroite2(Y,_,0) :- not(hautDroite(Y,_)),!.
@@ -567,7 +567,7 @@ compteur_hautDroite(Y,C,Count) :-
 nbrPion_hautDroite_ParAspiration(X,_,0) :- not(basGauche(X,_)),!.
 nbrPion_hautDroite_ParAspiration(X,_,0) :- basGauche(X,Z), cell(Z,B), B == -,!.
 nbrPion_hautDroite_ParAspiration(X,C,0) :- basGauche(X,Z), cell(Z,B), B == C,!.
-nbrPion_hautDroite_ParAspiration(X,C,Count) :- basGauche(X,Y), compteur_basGauche_aspiration(Y,C,Count).
+nbrPion_hautDroite_ParAspiration(X,C,Count) :- basGauche(X,Y), compteur_hautDroite_aspiration(Y,C,Count).
 
 compteur_hautDroite_aspiration(X,C,0) :- cell(X,B), B == C,!.
 compteur_hautDroite_aspiration(X,_,1) :- basGauche(X,Z), cell(Z,B), B == -,!.
@@ -584,7 +584,7 @@ compteur_hautDroite_aspiration(X,C,Count) :-
 
 verifPion_hautGauche2(X,Y,C,T) :- 
     cell(X, B),
-    nbrPion_hautGauche2(Y, B, C1), nbrPion_basDroite_ParAspiration(X,B,C2),
+    nbrPion_hautGauche2(Y, B, C1), nbrPion_hautGauche_ParAspiration(X,B,C2),
     eval_aspiration_vs_collision(C1,C2,C,T),!.
 
 nbrPion_hautGauche2(Y,_,0) :- not(hautGauche(Y,_)),!.
@@ -605,7 +605,7 @@ compteur_hautGauche(Y,C,Count) :-
 nbrPion_hautGauche_ParAspiration(X,_,0) :- not(basDroite(X,_)),!.
 nbrPion_hautGauche_ParAspiration(X,_,0) :- basDroite(X,Z), cell(Z,B), B == -,!.
 nbrPion_hautGauche_ParAspiration(X,C,0) :- basDroite(X,Z), cell(Z,B), B == C,!.
-nbrPion_hautGauche_ParAspiration(X,C,Count) :- basDroite(X,Y), compteur_basDroite_aspiration(Y,C,Count).
+nbrPion_hautGauche_ParAspiration(X,C,Count) :- basDroite(X,Y), compteur_hautGauche_aspiration(Y,C,Count).
 
 compteur_hautGauche_aspiration(X,C,0) :- cell(X,B), B == C,!.
 compteur_hautGauche_aspiration(X,_,1) :- basDroite(X,Z), cell(Z,B), B == -,!.
