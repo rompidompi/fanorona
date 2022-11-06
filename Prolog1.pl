@@ -681,13 +681,15 @@ jouer_bas(X, Y) :- bas(X,Y), cell(Y, B), elim_bas(Y, B).
 jouer_basGauche(X, Y) :- basGauche(X,Y), cell(Y, B), elim_basGauche(Y, B).
 jouer_basDroite(X, Y) :- basDroite(X,Y), cell(Y, B), elim_basDroite(Y, B).
 
+/* élimination par collision */
 destruction(X,Y,c) :-
 	retract( cell(X, H) ),
 	assert( cell(X, -) ),
 	retract( cell(Y, -) ),
 	assert( cell(Y, H) ),
 	not(jouer_coup(X,Y)).
-	
+
+/* élimination par aspiration */
 destruction(X,Y,a) :-
 	not(jouer_coup(Y, X)),
 	retract( cell(X, H) ),
@@ -701,17 +703,17 @@ play(X, Y) :-
 	(not(verifPion2(X, Y, _, T))); (verifPion2(X, Y, _, T)),
 	destruction(X,Y,T),
 	not(show_game),
+	nl,
+	ansi_format([bold,fg(red)], '~w', ['false.']),
 	find_best_move(Move, Score, Type),
-	nl,
-	nl,
+	nl, nl,
 	write('Votre adversaire a fait le coup '),
 	write(Move),
-	nl,
-	nl,
 	Move = [H|D],
 	D = [Z|_],
 	play_comp(H,Z).
-		
+	
+/* fonction utilisé pour un coup de l'IA */		
 play_comp(X, Y) :-	
 	can_playComp(X, Y),
 	(not(verifPion2(X, Y, _, T))); (verifPion2(X, Y, _, T)),

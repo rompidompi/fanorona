@@ -47,6 +47,7 @@ cell(h1,b).
 cell(i1,b).
 
 new_game :-
+	abort,
 	retract( cell(a5,A) ),
 	retract( cell(b5,B) ),
 	retract( cell(c5,C) ),
@@ -701,13 +702,12 @@ play(X, Y) :-
 	(not(verifPion2(X, Y, _, T))); (verifPion2(X, Y, _, T)),
 	destruction(X,Y,T),
 	not(show_game),
+	nl,
+	ansi_format([bold,fg(red)], '~w', ['false.']),
 	find_best_move(Move, Score, Type),
-	nl,
-	nl,
+	nl, nl,
 	write('Votre adversaire a fait le coup '),
 	write(Move),
-	nl,
-	nl,
 	Move = [H|D],
 	D = [Z|_],
 	play_comp(H,Z).
@@ -825,14 +825,5 @@ show_game :-
 	write('True').
 
 	
-		
-
-
-
-
-
-% https://www.youtube.com/watch?v=SykxWpFwMGs&t=415s
-% timestamp 30:00 pour vertical / horizontal
-% timestamp 39:30 pour opérations math
-% timestamp 20:00 format de texte
+	
 
