@@ -11,9 +11,9 @@ cell(a5,b).
 cell(b5,n).
 cell(c5,n).
 cell(d5,n).
-cell(e5,-).
+cell(e5,n).
 cell(f5,n).
-cell(g5,n).
+cell(g5,-).
 cell(h5,n).
 cell(i5,n).
 cell(a4,n).
@@ -29,7 +29,7 @@ cell(a3,n).
 cell(b3,b). 
 cell(c3,n). 
 cell(d3,b). 
-cell(e3,b). 
+cell(e3,n). 
 cell(f3,n). 
 cell(g3,b). 
 cell(h3,n). 
@@ -39,7 +39,7 @@ cell(b2,b).
 cell(c2,b). 
 cell(d2,b). 
 cell(e2,-). 
-cell(f2,b). 
+cell(f2,-). 
 cell(g2,b). 
 cell(h2,b). 
 cell(i2,b).
@@ -316,6 +316,7 @@ verifPion_haut2(X,Y,C,a) :-
     haut(X,Y), bas(X,_), cell(X, B),
     nbrPion_basAspiration(X,B,C),!. 
 verifPion_haut2(X,Y,C,c) :- haut(X,Y), cell(X, B), nbrPion_haut(Y, B, C),!. 
+
 %verifPion_haut2(X,_,C,a) :- bas(X,Z), cell(X, B), nbrPion_bas(Z,B,C),!.
 
 verifPion_gauche2(X,Y,C,T) :- 
@@ -411,6 +412,18 @@ compteur_haut2(X,C,Count) :-
     case_a_compter(X, Z),
     Count is Count2 + Z.
 
+nbrPion_haut2(Y,_,0) :- not(haut(Y,_)),!.
+nbrPion_haut2(Y,_,0) :- haut(Y,Z), cell(Z,B), B == -,!.
+nbrPion_haut2(Y,C,0) :- haut(Y,Z), cell(Z,B), B == C,!.
+nbrPion_haut2(Y,C,Count) :- compteur_haut(Y,C,Count).
+compteur_haut(Y,_,0) :- not(haut(Y,_)),!.
+compteur_haut(Y,C,0) :- cell(Y,B), B == C,!.
+compteur_haut(Y,_,0) :- haut(Y,Z), cell(Z,B), B == -,!.
+compteur_haut(Y,C,Count) :-
+    haut(Y,Z),
+    compteur_haut3(Z,C,Count2),
+    Count is Count2 + 1.
+    
 nbrPion_hautGauche(X, B, Count) :- compteur_hautGauche2(X, B, Count).
 %base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut
 compteur_hautGauche2(X, C, 0) :- cell(X, B), B == C,!.
