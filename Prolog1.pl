@@ -263,6 +263,7 @@ basGauche(X,Y) :-
 basDroite(X,Y) :-
     hautGauche(Y,X).
 
+/* Évalue si une case Y est liée à une case X */
 nearby_cells(X,Y):-
     droite(X,Y),cell(Y,-),cell(X,n);
     gauche(X,Y),cell(Y,-),cell(X,n);
@@ -273,11 +274,15 @@ nearby_cells(X,Y):-
     hautDroite(X,Y),cell(Y,-),cell(X,n);
     hautGauche(X,Y),cell(Y,-),cell(X,n).
 
+% find_all_playable_moves(-Moves)
 find_all_playable_moves(Moves):-
     findall([X,Y], nearby_cells(X,Y), Moves).
 
 
-/* Boucle pour déterminer nombre de pions adverses avec aspiration-collision */
+/* Boucle pour déterminer nombre de pions adverses avec aspiration-collision 
+ * 
+ * verifPion(+X, +Y, -HeuristicValue, -MoveType)
+ */
 verifPion(X, Y, C, T) :- 
     verifPion_droite(X, Y, C, T),!;
     verifPion_bas(X, Y, C, T),!;
@@ -288,13 +293,15 @@ verifPion(X, Y, C, T) :-
     verifPion_hautDroite(X, Y, C, T),!;
     verifPion_hautGauche(X, Y, C, T),!.
 
+/* Retourne le premier élément d'une liste */
 head([H|_], H).
 
+% find_best_move(-Move, -Score, -MoveType)
 find_best_move(Move, Score, Type):-
 	find_all_playable_moves(Moves),
     return_best_move(Moves, Move, Score, Type).
 
-%base case : la liste est vide -> retourner 0 comme valeur de BestScore.
+% return_best_move(+Moves, -BestMove, -BestScore, -MoveType)
 return_best_move([], [], 0, 0).
 return_best_move([H|T], BestMove, BestScore, Type) :-
     get_score(H, C, Te),
@@ -304,7 +311,7 @@ return_best_move([H|T], BestMove, BestScore, Type) :-
     return_best_move(T, NewBestMove, NewBestScore, NewType),
     eval_score(TempBestMove, TempScore, TempType, NewBestMove, NewBestScore, NewType, BestMove, BestScore, Type),!.
 
-% eval_score(+score1, +score2, -BestScore)
+% eval_score(+Move1, Score1, +MoveType1, +Move2, +Score2, +MoveType2, -BestMove, -BestScore, -BestMoveType)
 eval_score(Move1, Score1, Type1, _, Score2, _, Move1, Score1, Type1) :-
     Score1 > Score2,!.
 eval_score(_, Score1, _, Move2, Score2, Type2, Move2, Score2, Type2) :-
@@ -318,16 +325,10 @@ get_random_move(R, Move1, Score1, Type1, _, _, _, Move1, Score1, Type1):-
     R < 6,!.
 get_random_move(_, _, _, _, Move2, Score2, Type2, Move2, Score2, Type2).
     
+% get_score(+move, -HeuristicValue, -MoveType)
 get_score([H|T], C, Type):-
     head(T, L),!,
     verifPion(H, L, C, Type).
-
-case_a_compter(X, 0) :-
-    cell(X,C),
-    C == -,!.
-case_a_compter(X, 1) :-
-    cell(X,C),
-    C \= -,!.
 
 eval_aspiration_vs_collision(C1, C2, C1,c) :-
     C1 >= C2.
@@ -335,17 +336,34 @@ eval_aspiration_vs_collision(C1,C2,C2,a) :-
     C2 > C1.
     
 
-
+/* 
+ * Les fonctions suivantes vérifient si la liaison existe, si oui, va chercher les valeurs 
+ * heuristiques du coup par collision et aspiration, les compare et retourne la valeur la plus élevée 
+ * ainsi que le type. Seules celles par en haut sont documentées car toutes les autres font la même chose
+ * mais dans une direction différente.
+ * 
+ * verifPion_haut(+X, +Y, -HeuristicValue, -MoveType)
+*/
 verifPion_haut(X,Y,C,T) :- 
     haut(X,Y), cell(X, B),
     nbrPion_haut(Y, B, C1), nbrPion_haut_ParAspiration(X,B,C2),
     eval_aspiration_vs_collision(C1,C2,C,T),!.
 
+/* Validations de cas limites hors jeux en haut par collision
+ * 
+ * nbrPion_haut(+Y, +tokenColor, -HeuristicValue),
+ * où Y représente la case où on se déplace
+*/
 nbrPion_haut(Y,_,0) :- not(haut(Y,_)),!.
 nbrPion_haut(Y,_,0) :- haut(Y,Z), cell(Z,B), B == -,!.
 nbrPion_haut(Y,C,0) :- haut(Y,Z), cell(Z,B), B == C,!.
 nbrPion_haut(Y,C,Count) :- haut(Y,Z), compteur_haut(Z,C,Count).
 
+/* Compte la nombre de pions par en haut capturables
+ * 
+ * compteur_haut(+Y, +TokenColor, -HeuristicValue),
+ * où Y représente le premier pion qu'on éliminerait 
+*/
 compteur_haut(Y,C,0) :- cell(Y,B), B == C,!.
 compteur_haut(Y,_,1) :- haut(Y,Z), cell(Z,B), B == -,!.
 compteur_haut(Y,_,1) :- not(haut(Y,_)),!.
@@ -354,12 +372,21 @@ compteur_haut(Y,C,Count) :-
     compteur_haut(Z,C,Count2),
     Count is Count2 + 1.
 
-
+/* Validations de cas limites hors jeux en bas par aspiration 
+ * 
+ * nbrPion_haut_ParAspiration(+X, +TokenColor, -HeuristicValue),
+ * où X représente la case où on se déplace 
+*/
 nbrPion_haut_ParAspiration(X,_,0) :- not(bas(X,_)),!.
 nbrPion_haut_ParAspiration(X,_,0) :- bas(X,Z), cell(Z,B), B == -,!.
 nbrPion_haut_ParAspiration(X,C,0) :- bas(X,Z), cell(Z,B), B == C,!.
 nbrPion_haut_ParAspiration(X,C,Count) :- bas(X,Y), compteur_haut_aspiration(Y,C,Count).
 
+/* Compte la nombre de pions par en bas capturables par aspiration sur un coup par en haut
+ * 
+ * compteur_haut_aspiration(+X, +TokenColor, -HeuristicValue),
+ * où X représente le premier pion qu'on éliminerait 
+*/
 compteur_haut_aspiration(X,C,0) :- cell(X,B), B == C,!.
 compteur_haut_aspiration(X,_,1) :- bas(X,Z), cell(Z,B), B == -,!.
 compteur_haut_aspiration(X,_,1) :- not(bas(X,_)),!.
