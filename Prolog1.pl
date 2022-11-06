@@ -4,7 +4,7 @@ cell(a5,n).
 cell(b5,n).
 cell(c5,n).
 cell(d5,n).
-cell(e5,-).
+cell(e5,n).
 cell(f5,n).
 cell(g5,n).
 cell(h5,n).
@@ -13,7 +13,7 @@ cell(a4,n).
 cell(b4,n).
 cell(c4,n).
 cell(d4,n).
-cell(e4,-).
+cell(e4,n).
 cell(f4,n).
 cell(g4,n).
 cell(h4,n).
@@ -22,7 +22,7 @@ cell(a3,n).
 cell(b3,b). 
 cell(c3,n). 
 cell(d3,b). 
-cell(e3,b). 
+cell(e3,-). 
 cell(f3,n). 
 cell(g3,b). 
 cell(h3,n). 
@@ -31,7 +31,7 @@ cell(a2,b).
 cell(b2,b). 
 cell(c2,b). 
 cell(d2,b). 
-cell(e2,-). 
+cell(e2,b). 
 cell(f2,b). 
 cell(g2,b). 
 cell(h2,b). 
@@ -706,9 +706,7 @@ play(X, Y) :-
 	nl,
 	write(Move),
 	nl,
-	write(Score),
 	nl,
-	write(Type),
 	nl,
 	nl,
 	Move = [H|D],
@@ -718,7 +716,6 @@ play(X, Y) :-
 play_comp(X, Y) :-	
 	can_playComp(X, Y),
 	(not(verifPion2(X, Y, _, T))); (verifPion2(X, Y, _, T)),
-	write(X + Y + T),
 	destruction(X,Y,T),
 	show_game.
 	
