@@ -1,5 +1,6 @@
 :- dynamic cell/2.
 
+/* Base de donnée des cellules */
 cell(a5,n).
 cell(b5,n).
 cell(c5,n).
@@ -46,6 +47,7 @@ cell(g1,b).
 cell(h1,b).
 cell(i1,b).
 
+/* fonction utilisée pour recommencer une partie, fonctionnement douteux dans SWI-Prolog, on est mieux de fermé SWI-Prolog et le réouvrir pour un meilleur résultat */
 new_game :-
 	retract( cell(a5,A) ),
 	retract( cell(b5,B) ),
@@ -616,8 +618,6 @@ compteur_hautGauche_aspiration(X,C,Count) :-
     Count is Count2 + 1.
 
 
-
-
 /* fonction déterminant si un coup est permis */
 can_play(X, Y) :-
 	cell(X, b),
@@ -661,7 +661,7 @@ elim_basDroite(X, C) :- basDroite(X,Y), cell(Y, B), C \= B, B \= -, eliminate(Y,
 
 
 
-%verif_droite(X, Y) :- droite(X,Y), cell(Y, B), not(elim_gauche(X,B)), elim_droite(Y, B). ------ Version destruction avant et arriere
+/* Detection du sens du coup */
 jouer_coup(X,Y) :-
     jouer_bas(X,Y);
     jouer_basDroite(X,Y);
@@ -672,6 +672,7 @@ jouer_coup(X,Y) :-
     jouer_hautDroite(X,Y);
     jouer_hautGauche(X,Y).
 
+/* élimination de cellules */
 jouer_droite(X, Y) :- droite(X,Y), cell(Y, B), elim_droite(Y, B).
 jouer_gauche(X, Y) :- gauche(X,Y), cell(Y, B), elim_gauche(Y, B).
 jouer_haut(X, Y) :- haut(X,Y), cell(Y, B), elim_haut(Y, B).

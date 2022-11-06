@@ -724,6 +724,7 @@ play_comp(X, Y) :-
 /* fonctions d'affichage du jeu */
 show_game :-
 
+/* déclaration des cellules du jeu pour affichage */
 	% line 1
 	cell(a1, A1), 
 	cell(b1, B1), 
@@ -778,7 +779,8 @@ show_game :-
 	cell(g5, G5), 
 	cell(h5, H5), 
 	cell(i5, I5),
-
+	
+/* Structure sous forme de liste pour simplifier l'affichage */
 	L5 = ["5| ", A5, -, B5, -, C5, -, D5, -, E5, -, F5, -, G5, -, H5, -, I5],
 	L4 = ["4| ", A4, -, B4, -, C4, -, D4, -, E4, -, F4, -, G4, -, H4, -, I4],
 	L3 = ["3| ", A3, -, B3, -, C3, -, D3, -, E3, -, F3, -, G3, -, H3, -, I3],
@@ -786,6 +788,7 @@ show_game :-
 	L1 = ["1| ", A1, -, B1, -, C1, -, D1, -, E1, -, F1, -, G1, -, H1, -, I1],
 	L0 = ["0  ", "A",  -, "B",  -, "C",  -, "D",  -, "E",  -, "F",  -, "G",  -, "H",  -, "I"],
 
+/* Affichage du jeu */
 	nl,	
 	nl,
 	write(L5),
