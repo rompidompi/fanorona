@@ -704,11 +704,8 @@ play(X, Y) :-
 	find_best_move(Move, Score, Type),
 	nl,
 	nl,
+	write('Votre adversaire a fait le coup '),
 	write(Move),
-	nl,
-	write(Score),
-	nl,
-	write(Type),
 	nl,
 	nl,
 	Move = [H|D],
@@ -810,9 +807,6 @@ show_game :-
 	nl,
 	write(L0),
 	nl,
-	nl,
-	write('Your opponent has played!'),
-	nl,	
 	nl,
 	
 	/* On vérifie ici si la partie est terminée */

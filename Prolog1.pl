@@ -704,9 +704,8 @@ play(X, Y) :-
 	find_best_move(Move, Score, Type),
 	nl,
 	nl,
+	write('Votre adversaire a fait le coup '),
 	write(Move),
-	nl,
-	nl,
 	nl,
 	nl,
 	Move = [H|D],
@@ -809,9 +808,6 @@ show_game :-
 	write(L0),
 	nl,
 	nl,
-	write('Your opponent has played!'),
-	nl,	
-	nl,
 	
 	/* On vérifie ici si la partie est terminée */
 	findall( C, cell(C, b), R ), /* On compile une liste de tout les occurences de cellules appartenant à b */
@@ -829,14 +825,5 @@ show_game :-
 	write('True').
 
 	
-		
-
-
-
-
-
-% https://www.youtube.com/watch?v=SykxWpFwMGs&t=415s
-% timestamp 30:00 pour vertical / horizontal
-% timestamp 39:30 pour opérations math
-% timestamp 20:00 format de texte
+	
 
