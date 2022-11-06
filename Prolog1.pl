@@ -9,22 +9,22 @@
 
 cell(a5,b).
 cell(b5,n).
-cell(c5,n).
+cell(c5,-).
 cell(d5,n).
 cell(e5,n).
 cell(f5,n).
-cell(g5,-).
-cell(h5,n).
+cell(g5,b).
+cell(h5,b).
 cell(i5,n).
 cell(a4,n).
 cell(b4,-).
 cell(c4,n).
 cell(d4,n).
-cell(e4,-).
-cell(f4,n).
+cell(e4,b).
+cell(f4,-).
 cell(g4,n).
 cell(h4,-).
-cell(i4,n).
+cell(i4,-).
 cell(a3,n).
 cell(b3,b). 
 cell(c3,n). 
@@ -33,8 +33,8 @@ cell(e3,n).
 cell(f3,n). 
 cell(g3,b). 
 cell(h3,n). 
-cell(i3,b).
-cell(a2,b). 
+cell(i3,-).
+cell(a2,-). 
 cell(b2,b). 
 cell(c2,b). 
 cell(d2,b). 
@@ -49,7 +49,7 @@ cell(c1,b).
 cell(d1,b). 
 cell(e1,b). 
 cell(f1,b). 
-cell(g1,b).
+cell(g1,n).
 cell(h1,b).
 cell(i1,b).
 
@@ -224,27 +224,6 @@ jouer_bas(X, Y) :- bas(X,Y), cell(Y, B), elim_bas(Y, B).
 jouer_basGauche(X, Y) :- basGauche(X,Y), cell(Y, B), elim_basGauche(Y, B).
 jouer_basDroite(X, Y) :- basDroite(X,Y), cell(Y, B), elim_basDroite(Y, B).
 
-/* Boucle pour déterminer nombre de pions adverses */
-verifPion(X, Y, C) :- 
-    verifPion_droite(X, Y, C),!;
-    verifPion_bas(X, Y, C),!;
-    verifPion_basDroite(X, Y, C),!;
-    verifPion_basGauche(X, Y, C),!;
-    verifPion_gauche(X, Y, C),!;
-    verifPion_haut(X, Y, C),!;
-    verifPion_hautDroite(X, Y, C),!;
-    verifPion_hautGauche(X, Y, C),!.
-/* Boucle pour déterminer nombre de pions adverses avec aspiration/collision */
-verifPion2(X, Y, C, T) :- 
-    verifPion_droite2(X, Y, C, T),!;
-    verifPion_bas2(X, Y, C, T),!;
-    verifPion_basDroite2(X, Y, C, T),!;
-    verifPion_basGauche2(X, Y, C, T),!;
-    verifPion_gauche2(X, Y, C, T),!;
-    verifPion_haut2(X, Y, C, T),!;
-    verifPion_hautDroite2(X, Y, C, T),!;
-    verifPion_hautGauche2(X, Y, C, T),!.
-
 head([H|_], H).
 
 find_best_move(Move, Score, Type):-
@@ -279,230 +258,77 @@ get_score([H|T], C, Type):-
     head(T, L),!,
     verifPion2(H, L, C, Type).
 
-case_a_compter(X, 0) :-
-    cell(X,C),
-    C == -,!.
-case_a_compter(X, 1) :-
-    cell(X,C),
-    C \= -,!.
+/* Boucle pour déterminer nombre de pions adverses avec aspiration/collision */
+verifPion2(X, Y, C, T) :- 
+    verifPion_droite(X, Y, C, T),!;
+    verifPion_bas(X, Y, C, T),!;
+    verifPion_basDroite(X, Y, C, T),!;
+    verifPion_basGauche(X, Y, C, T),!;
+    verifPion_gauche(X, Y, C, T),!;
+    verifPion_haut(X, Y, C, T),!;
+    verifPion_hautDroite(X, Y, C, T),!;
+    verifPion_hautGauche(X, Y, C, T),!.
+
+verifPion_haut(X,Y,C,T) :- 
+    cell(X, B),
+    nbrPion_haut2(Y, B, C1), nbrPion_bas_ParAspiration(X,B,C2),
+    eval_aspiration_vs_collision(C1,C2,C,T),!.
+nbrPion_haut2(Y,_,0) :- not(haut(Y,_)),!.
+nbrPion_haut2(Y,_,0) :- haut(Y,Z), cell(Z,B), B == -,!.
+nbrPion_haut2(Y,C,0) :- haut(Y,Z), cell(Z,B), B == C,!.
+nbrPion_haut2(Y,C,Count) :- haut(Y,Z), compteur_haut(Z,C,Count).
+
+compteur_haut(Y,C,0) :- cell(Y,B), B == C,!.
+compteur_haut(Y,_,1) :- haut(Y,Z), cell(Z,B), B == -,!.
+compteur_haut(Y,_,1) :- not(haut(Y,_)),!.
+compteur_haut(Y,C,Count) :-
+    haut(Y,Z),
+    compteur_haut(Z,C,Count2),
+    Count is Count2 + 1.
+    
+nbrPion_bas_ParAspiration(X,_,0) :- not(bas(X,_)),!.
+nbrPion_bas_ParAspiration(X,_,0) :- bas(X,Z), cell(Z,B), B == -,!.
+nbrPion_bas_ParAspiration(X,C,0) :- bas(X,Z), cell(Z,B), B == C,!.
+nbrPion_bas_ParAspiration(X,C,Count) :- bas(X,Y), compteur_bas_aspiration(Y,C,Count).
+compteur_bas_aspiration(X,C,0) :- cell(X,B), B == C,!.
+compteur_bas_aspiration(X,_,1) :- not(bas(X,_)),!.
+compteur_bas_aspiration(X,_,0) :- bas(X,Z), cell(Z,B), B == -,!.
+compteur_bas_aspiration(X,C,Count) :-
+    bas(X,Z),
+    compteur_bas_aspiration(Z,C,Count2),
+    Count is Count2 + 1.
+
+verifPion_bas(X,Y,C,T) :- 
+    cell(X, B),
+    nbrPion_bas(Y, B, C1), nbrPion_haut_ParAspiration(X,B,C2),
+    eval_aspiration_vs_collision(C1,C2,C,T),!.
+nbrPion_bas(Y,_,0) :- not(bas(Y,_)),!.
+nbrPion_bas(Y,_,0) :- bas(Y,Z), cell(Z,B), B == -,!.
+nbrPion_bas(Y,C,0) :- bas(Y,Z), cell(Z,B), B == C,!.
+nbrPion_bas(Y,C,Count) :- compteur_bas(Y,C,Count).
+compteur_bas(Y,_,0) :- not(bas(Y,_)),!.
+compteur_bas(Y,C,0) :- cell(Y,B), B == C,!.
+compteur_bas(Y,_,0) :- bas(Y,Z), cell(Z,B), B == -,!.
+compteur_bas(Y,C,Count) :-
+    bas(Y,Z),
+    compteur_bas(Z,C,Count2),
+    Count is Count2 + 1.
+nbrPion_haut_ParAspiration(X,_,0) :- not(haut(X,_)),!.
+nbrPion_haut_ParAspiration(X,_,0) :- haut(X,Z), cell(Z,B), B == -,!.
+nbrPion_haut_ParAspiration(X,C,0) :- haut(X,Z), cell(Z,B), B == C,!.
+nbrPion_haut_ParAspiration(X,C,Count) :- haut(X,Y), compteur_haut_aspiration(Y,C,Count).
+compteur_haut_aspiration(X,C,0) :- cell(X,B), B == C,!.
+compteur_haut_aspiration(X,_,1) :- not(haut(X,_)),!.
+compteur_haut_aspiration(X,_,0) :- haut(X,Z), cell(Z,B), B == -,!.
+compteur_haut_aspiration(X,C,Count) :-
+    haut(X,Z),
+    compteur_haut_aspiration(Z,C,Count2),
+    Count is Count2 + 1.
 
 eval_aspiration_vs_collision(C1, C2, C1,c) :-
     C1 >= C2.
 eval_aspiration_vs_collision(C1,C2,C2,a) :-
     C2 > C1.
-    
-verifPion_droite(X,Y,C) :- droite(X,Y), cell(X, B), nbrPion_droite(Y, B, C).
-verifPion_haut(X,Y,C) :- haut(X,Y),cell(X, B), nbrPion_haut(Y, B, C).
-verifPion_gauche(X,Y,C) :- gauche(X,Y), cell(X, B), nbrPion_gauche(Y, B, C).
-verifPion_hautGauche(X,Y,C) :- hautGauche(X,Y), cell(X, B), nbrPion_hautGauche(Y, B, C).
-verifPion_hautDroite(X,Y,C) :- hautDroite(X,Y), cell(X, B), nbrPion_hautDroite(Y, B, C).
-verifPion_bas(X,Y,C) :- bas(X,Y), cell(X, B), nbrPion_bas(Y, B, C).
-verifPion_basGauche(X,Y,C) :- basGauche(X,Y), cell(X, B), nbrPion_basGauche(Y, B, C).
-verifPion_basDroite(X,Y,C) :- basDroite(X,Y), cell(X, B), nbrPion_basDroite(Y, B, C).
-
-verifPion_droite2(X,Y,C,T) :-
-    droite(X,Y), cell(X,B), droite(Y,Z), gauche(X,_), 
-    nbrPion_droite(Z,B,C1), nbrPion_gaucheAspiration(X,B,C2),
-    eval_aspiration_vs_collision(C1,C2,C,T),!.
-verifPion_droite2(X,Y,C,c) :-
-    droite(X,Y), droite(Y,Z), cell(X,B), nbrPion_droite(Z,B,C),!.
-%verifPion_droite2(X,_,C,a) :- gauche(X,Z), cell(X,B), nbrPion_gauche(Z,B,C),!.
-
-verifPion_haut2(X,Y,C,T) :- 
-    haut(X,Y), bas(X,_), cell(X, B), haut(Y,Z), 
-    nbrPion_haut(Z, B, C1), nbrPion_basAspiration(X,B,C2),
-    eval_aspiration_vs_collision(C1,C2,C,T),!.
-verifPion_haut2(X,Y,C,a) :-
-    haut(X,Y), bas(X,_), cell(X, B),
-    nbrPion_basAspiration(X,B,C),!. 
-verifPion_haut2(X,Y,C,c) :- haut(X,Y), cell(X, B), nbrPion_haut(Y, B, C),!. 
-
-%verifPion_haut2(X,_,C,a) :- bas(X,Z), cell(X, B), nbrPion_bas(Z,B,C),!.
-
-verifPion_gauche2(X,Y,C,T) :- 
-    gauche(X,Y), droite(X,_), cell(X, B), gauche(Y,Z),
-    nbrPion_gauche(Z, B, C1), nbrPion_droiteAspiration(X,B,C2),
-    eval_aspiration_vs_collision(C1,C2,C,T),!.
-verifPion_gauche2(X,Y,C,a) :- 
-    gauche(X,Y), droite(X,_), cell(X, B),
-    nbrPion_droiteAspiration(X,B,C),!. 
-verifPion_gauche2(X,Y,C,c) :- gauche(X,Y), cell(X, B), nbrPion_gauche(Y, B, C),!.
-%verifPion_gauche2(X,_,C,a) :- droite(X,Z), cell(X, B), nbrPion_droite(Z,B,C),!.
-
-verifPion_hautGauche2(X,Y,C,T) :-
-    hautGauche(X,Y), basDroite(X,_), cell(X, B), hautGauche(Y,Z),
-    nbrPion_hautGauche(Z, B, C1), nbrPion_basDroiteAspiration(X,B,C2), 
-    eval_aspiration_vs_collision(C1,C2,C,T),!.
-verifPion_hautGauche2(X,Y,C,a) :-
-    hautGauche(X,Y), basDroite(X,_), cell(X, B),
-    nbrPion_basDroiteAspiration(X,B,C),!. 
-verifPion_hautGauche2(X,Y,C,c) :- hautGauche(X,Y), cell(X, B), nbrPion_hautGauche(Y, B, C),!.
-%verifPion_hautGauche2(X,_,C,a) :- basDroite(X,Z), cell(X, B), nbrPion_basDroite(Z,B,C),!.
-
-verifPion_hautDroite2(X,Y,C,T) :-
-    hautDroite(X,Y), basGauche(X,_), cell(X, B), hautDroite(Y,Z),
-    nbrPion_hautDroite(Z, B, C1), nbrPion_basGaucheAspiration(X,B,C2), 
-    eval_aspiration_vs_collision(C1,C2,C,T),!.
-verifPion_hautDroite2(X,Y,C,a) :-    
-    hautDroite(X,Y), basGauche(X,_), cell(X, B),
-    nbrPion_basGaucheAspiration(X,B,C),!. 
-verifPion_hautDroite2(X,Y,C,c) :- hautDroite(X,Y), cell(X, B), nbrPion_hautDroite(Y, B, C),!.
-%verifPion_hautDroite2(X,_,C,a) :- basGauche(X,Z), cell(X, B), nbrPion_basGauche(Z,B,C),!.
-
-verifPion_bas2(X,Y,C,T) :-
-    bas(X,Y), haut(X,_), cell(X, B), bas(Y,Z),
-    nbrPion_bas(Z, B, C1), nbrPion_hautAspiration(X,B,C2), 
-    eval_aspiration_vs_collision(C1,C2,C,T),!.
-verifPion_bas2(X,Y,C,a) :-    
-    bas(X,Y), haut(X,_), cell(X, B),
-    nbrPion_hautAspiration(X,B,C),!. 
-verifPion_bas2(X,Y,C,c) :- bas(X,Y), cell(X, B), nbrPion_bas(Y, B, C),!.
-%verifPion_bas2(X,_,C,a) :- haut(X,Z), cell(X, B), nbrPion_haut(Z,B,C),!. 
-
-verifPion_basGauche2(X,Y,C,T) :-
-    basGauche(X,Y), hautDroite(X,_), cell(X, B), basGauche(Y,Z),
-    nbrPion_basGauche(Z, B, C1), nbrPion_hautDroiteAspiration(X,B,C2), 
-    eval_aspiration_vs_collision(C1,C2,C,T),!.
-verifPion_basGauche2(X,Y,C,a) :-    
-    basGauche(X,Y), hautDroite(X,_), cell(X, B),
-    nbrPion_hautDroiteAspiration(X,B,C),!. 
-verifPion_basGauche2(X,Y,C,c) :- basGauche(X,Y), cell(X, B), nbrPion_basGauche(Y, B, C),!.
-%verifPion_basGauche2(X,_,C,a) :- hautDroite(X,Z), cell(X, B), nbrPion_hautDroite(Z,B,C),!. 
-
-verifPion_basDroite2(X,Y,C,T) :-
-    basDroite(X,Y), hautGauche(X,_), cell(X, B), basDroite(Y,Z),
-    nbrPion_basDroite(Z, B, C1), nbrPion_hautGaucheAspiration(X,B,C2), 
-    eval_aspiration_vs_collision(C1,C2,C,T),!.
-verifPion_basDroite2(X,Y,C,a) :-    
-    basDroite(X,Y), hautGauche(X,_), cell(X, B),
-    nbrPion_hautGaucheAspiration(X,B,C),!. 
-verifPion_basDroite2(X,Y,C,c) :- basDroite(X,Y), cell(X, B), nbrPion_basDroite(Y, B, C),!.
-%verifPion_basDroite2(X,_,C,a) :- hautGauche(X,Z), cell(X, B), nbrPion_hautGauche(Z,B,C),!.
-
-nbrPion_droite(X, B, Count) :- compteur_droite2(X, B, Count),!.
-%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases à gauche
-compteur_droite2(X, C, 0) :- cell(X, B), B == C,!.
-compteur_droite2(X, _, 1) :- not(droite(X,_)),!.
-compteur_droite2(X,_,1):- cell(X,-),!. 
-compteur_droite2(X,C,Count) :- 
-    droite(X,Y),
-    compteur_droite2(Y, C, Count2),
-    case_a_compter(X, Z),
-    Count is Count2 + Z.
-
-nbrPion_gauche(X, B, Count) :- compteur_gauche2(X, B, Count),!.
-%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases à gauche
-compteur_gauche2(X, C, 0) :- cell(X, B), B == C,!.
-compteur_gauche2(X, _, 1) :- not(gauche(X,_)),!.
-compteur_gauche2(X,_,0):- cell(X,-),!.
-compteur_gauche2(X,C,Count) :- 
-    gauche(X,Y),
-    compteur_gauche2(Y, C, Count2),
-    case_a_compter(X, Z),
-    Count is Count2 + Z.
-
-nbrPion_haut(X, B, Count) :- compteur_haut2(X, B, Count).
-%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut à gauche
-compteur_haut2(X, C, 0) :- cell(X, B), B == C,!.
-compteur_haut2(X,_,1) :- not(haut(X,_)),!.
-compteur_haut2(X,_,0):- cell(X,-),!. 
-compteur_haut2(X,C,Count) :- 
-    haut(X,Y),
-    compteur_haut2(Y, C, Count2),
-    case_a_compter(X, Z),
-    Count is Count2 + Z.
-
-nbrPion_haut2(Y,_,0) :- not(haut(Y,_)),!.
-nbrPion_haut2(Y,_,0) :- haut(Y,Z), cell(Z,B), B == -,!.
-nbrPion_haut2(Y,C,0) :- haut(Y,Z), cell(Z,B), B == C,!.
-nbrPion_haut2(Y,C,Count) :- compteur_haut(Y,C,Count).
-compteur_haut(Y,_,0) :- not(haut(Y,_)),!.
-compteur_haut(Y,C,0) :- cell(Y,B), B == C,!.
-compteur_haut(Y,_,0) :- haut(Y,Z), cell(Z,B), B == -,!.
-compteur_haut(Y,C,Count) :-
-    haut(Y,Z),
-    compteur_haut3(Z,C,Count2),
-    Count is Count2 + 1.
-    
-nbrPion_hautGauche(X, B, Count) :- compteur_hautGauche2(X, B, Count).
-%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut
-compteur_hautGauche2(X, C, 0) :- cell(X, B), B == C,!.
-compteur_hautGauche2(X,_,1) :- not(hautGauche(X,_)),!.
-compteur_hautGauche2(X,_,0):- cell(X,-),!. 
-compteur_hautGauche2(X,C,Count) :- 
-    hautGauche(X,Y),
-    compteur_hautGauche2(Y, C, Count2),
-    case_a_compter(X, Z),
-    Count is Count2 + Z.
-
-nbrPion_hautDroite(X, B, Count) :- compteur_hautDroite2(X, B, Count).
-%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut
-compteur_hautDroite2(X, C, 0) :- cell(X, B), B == C,!.
-compteur_hautDroite2(X,_,1) :- not(hautDroite(X,_)),!.
-compteur_hautDroite2(X,_,0):- cell(X,-),!. 
-compteur_hautDroite2(X,C,Count) :- 
-    hautDroite(X,Y),
-    compteur_hautDroite2(Y, C, Count2),
-    case_a_compter(X, Z),
-    Count is Count2 + Z.
-
-%nbrPion_bas(X, B, Count) :- compteur_bas2(X, B, Count).
-nbrPion_bas(X, B, Count) :- compteur_bas2(X, B, Count).
-%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut
-compteur_bas2(X, C, 0) :- cell(X, B), B == C,!.
-compteur_bas2(X, _, 1) :- not(bas(X,_)),!.
-compteur_bas2(X,_,0):- cell(X,-),!. 
-compteur_bas2(X,C,Count) :- 
-    bas(X,Y),
-    compteur_bas2(Y, C, Count2),
-    case_a_compter(X, Z),
-    Count is Count2 + Z.
-
-nbrPion_basGauche(X, B, Count) :- compteur_basGauche2(X, B, Count).
-%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut
-compteur_basGauche2(X, C, 0) :- cell(X, B), B == C,!.
-compteur_basGauche2(X, _, 1) :- not(basGauche(X,_)),!.
-compteur_basGauche2(X,_,0):- cell(X,-),!. 
-compteur_basGauche2(X,C,Count) :- 
-    basGauche(X,Y),
-    compteur_basGauche2(Y, C, Count2),
-    case_a_compter(X, Z),
-    Count is Count2 + Z.
-
-nbrPion_basDroite(X, B, Count) :- compteur_basDroite2(X, B, Count).
-%base case : la case de départ à la même couleur que la case courante ou il n'y a pas de cases plus haut
-compteur_basDroite2(X, C, 0) :- cell(X, B), B == C,!.
-compteur_basDroite2(X, _, 1) :- not(basDroite(X,_)),!.
-compteur_basDroite2(X,_,0):- cell(X,-),!. 
-compteur_basDroite2(X,C,Count) :- 
-    basDroite(X,Y),
-    compteur_basDroite2(Y, C, Count2),
-    case_a_compter(X, Z),
-    Count is Count2 + Z.
-
-nbrPion_basAspiration(X,_,0) :- bas(X,Y), cell(Y,C), C == -,!.
-nbrPion_basAspiration(X,B,Count) :- bas(X,Y), compteur_bas2(Y,B,Count),!.
-
-nbrPion_hautAspiration(X,_,0) :- haut(X,Y), cell(Y,C), C == -,!.
-nbrPion_hautAspiration(X,B,Count) :- haut(X,Y), compteur_haut2(Y,B,Count),!.
-
-nbrPion_droiteAspiration(X,_,0) :- droite(X,Y), cell(Y,C), C == -,!.
-nbrPion_droiteAspiration(X,B,Count) :- droite(X,Y), compteur_droite2(Y,B,Count),!.
-
-nbrPion_gaucheAspiration(X,_,0) :- gauche(X,Y), cell(Y,C), C == -,!.
-nbrPion_gaucheAspiration(X,B,Count) :- gauche(X,Y), compteur_gauche2(Y,B,Count),!.
-
-nbrPion_hautGaucheAspiration(X,_,0) :- hautGauche(X,Y), cell(Y,C), C == -,!.
-nbrPion_hautGaucheAspiration(X,B,Count) :- hautGauche(X,Y), compteur_hautGauche2(Y,B,Count),!.
-
-nbrPion_hautDroiteAspiration(X,_,0) :- hautDroite(X,Y), cell(Y,C), C == -,!.
-nbrPion_hautDroiteAspiration(X,B,Count) :- hautDroite(X,Y), compteur_hautDroite2(Y,B,Count),!.
-
-nbrPion_basGaucheAspiration(X,_,0) :- basGauche(X,Y), cell(Y,C), C == -,!.
-nbrPion_basGaucheAspiration(X,B,Count) :- basGauche(X,Y), compteur_basGauche2(Y,B,Count),!.
-
-nbrPion_basDroiteAspiration(X,_,0) :- basDroite(X,Y), cell(Y,C), C == -,!.
-nbrPion_basDroiteAspiration(X,B,Count) :- basDroite(X,Y), compteur_basDroite2(Y,B,Count),!.
 
 /* fonction déterminant si un coup est permis */
 can_play(X, Y) :-
