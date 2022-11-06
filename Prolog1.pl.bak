@@ -7,39 +7,39 @@
 % cell(a2,n), cell(b2,n), cell(c2,n), cell(d2,n), cell(e2,n), cell(f2,n), cell(g2,n), cell(h2,n), cell(i2,n),
 % cell(a1,n), cell(b1,n), cell(c1,n), cell(d1,n), cell(e1,n), cell(f1,n), cell(g1,n), cell(h1,n), cell(i1,n)].
 
-cell(a5,n).
+cell(a5,b).
 cell(b5,n).
-cell(c5,n).
+cell(c5,-).
 cell(d5,n).
 cell(e5,n).
 cell(f5,n).
-cell(g5,n).
-cell(h5,n).
+cell(g5,b).
+cell(h5,b).
 cell(i5,n).
 cell(a4,n).
-cell(b4,n).
+cell(b4,-).
 cell(c4,n).
 cell(d4,n).
-cell(e4,n).
-cell(f4,n).
+cell(e4,b).
+cell(f4,-).
 cell(g4,n).
-cell(h4,n).
-cell(i4,n).
-cell(a3,n).
+cell(h4,-).
+cell(i4,-).
+cell(a3,b).
 cell(b3,b). 
 cell(c3,n). 
 cell(d3,b). 
-cell(e3,-). 
+cell(e3,n). 
 cell(f3,n). 
 cell(g3,b). 
 cell(h3,n). 
-cell(i3,b).
-cell(a2,b). 
+cell(i3,-).
+cell(a2,-). 
 cell(b2,b). 
 cell(c2,b). 
 cell(d2,b). 
-cell(e2,b). 
-cell(f2,b). 
+cell(e2,-). 
+cell(f2,-). 
 cell(g2,b). 
 cell(h2,b). 
 cell(i2,b).
@@ -49,7 +49,7 @@ cell(c1,b).
 cell(d1,b). 
 cell(e1,b). 
 cell(f1,b). 
-cell(g1,b).
+cell(g1,n).
 cell(h1,b).
 cell(i1,b).
 
@@ -180,20 +180,156 @@ basGauche(X,Y) :-
     hautDroite(Y,X).
 basDroite(X,Y) :-
     hautGauche(Y,X).
-	
 
+nearby_cells(X,Y):-
+    droite(X,Y),cell(Y,-),cell(X,n);
+    gauche(X,Y),cell(Y,-),cell(X,n);
+    haut(X,Y),cell(Y,-),cell(X,n);
+    bas(X,Y),cell(Y,-),cell(X,n);
+    basDroite(X,Y),cell(Y,-),cell(X,n);
+    basGauche(X,Y),cell(Y,-),cell(X,n);
+    hautDroite(X,Y),cell(Y,-),cell(X,n);
+    hautGauche(X,Y),cell(Y,-),cell(X,n).
 
-playable(X, Y) :- 
-	(droite(X,Y), cell(Y, -)).
-	
-	
+find_all_playable_moves(Moves):-
+    findall([X,Y], nearby_cells(X,Y), Moves).
 
 /* Liaison d'élimination */
 elim_droite(X, C) :- droite(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_droite(Y, C).
+elim_gauche(X, C) :- gauche(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_gauche(Y, C).
 elim_haut(X, C) :- haut(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_haut(Y, C).
+elim_hautGauche(X, C) :- hautGauche(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_hautGauche(Y, C).
+elim_hautDroite(X, C) :- hautDroite(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_hautDroite(Y, C).
+elim_bas(X, C) :- bas(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_bas(Y, C).
+elim_basGauche(X, C) :- basGauche(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_basGauche(Y, C).
+elim_basDroite(X, C) :- basDroite(X,Y), cell(Y, B), C \= B, eliminate(Y, B), elim_basDroite(Y, C).
 
-verif_droite(X, Y) :- droite(X,Y), cell(Y, B), elim_droite(Y, B).
-verif_haut(X, Y) :- haut(X,Y), cell(Y, B), elim_haut(Y, B).
+%verif_droite(X, Y) :- droite(X,Y), cell(Y, B), not(elim_gauche(X,B)), elim_droite(Y, B). ------ Version destruction avant et arriere
+jouer_coup(X,Y) :-
+    jouer_bas(X,Y);
+    jouer_basDroite(X,Y);
+    jouer_basGauche(X,Y);
+    jouer_droite(X,Y);
+    jouer_gauche(X,Y);
+    jouer_haut(X,Y);
+    jouer_hautDroite(X,Y);
+    jouer_hautGauche(X,Y).
+
+jouer_droite(X, Y) :- droite(X,Y), cell(Y, B), elim_droite(Y, B).
+jouer_gauche(X, Y) :- gauche(X,Y), cell(Y, B), elim_gauche(Y, B).
+jouer_haut(X, Y) :- haut(X,Y), cell(Y, B), elim_haut(Y, B).
+jouer_hautGauche(X, Y) :- hautGauche(X,Y), cell(Y, B), elim_hautGauche(Y, B).
+jouer_hautDroite(X, Y) :- hautDroite(X,Y), cell(Y, B), elim_hautDroite(Y, B).
+jouer_bas(X, Y) :- bas(X,Y), cell(Y, B), elim_bas(Y, B).
+jouer_basGauche(X, Y) :- basGauche(X,Y), cell(Y, B), elim_basGauche(Y, B).
+jouer_basDroite(X, Y) :- basDroite(X,Y), cell(Y, B), elim_basDroite(Y, B).
+
+head([H|_], H).
+
+find_best_move(Move, Score, Type):-
+	find_all_playable_moves(Moves),
+    return_best_move(Moves, Move, Score, Type).
+
+%base case : la liste est vide -> retourner 0 comme valeur de BestScore.
+return_best_move([], [], 0, 0).
+return_best_move([H|T], BestMove, BestScore, Type) :-
+    get_score(H, C, Te),
+    TempScore = C,
+    TempBestMove = H,
+    TempType = Te,
+    return_best_move(T, NewBestMove, NewBestScore, NewType),
+    eval_score(TempBestMove, TempScore, TempType, NewBestMove, NewBestScore, NewType, BestMove, BestScore, Type),!.
+
+% eval_score(+score1, +score2, -BestScore)
+eval_score(Move1, Score1, Type1, _, Score2, _, Move1, Score1, Type1) :-
+    Score1 > Score2,!.
+eval_score(_, Score1, _, Move2, Score2, Type2, Move2, Score2, Type2) :-
+    Score1 < Score2,!.
+eval_score(Move1, Score1, Type1, Move2, Score2, Type2, Move, Score, Type):-
+    Score1 == Score2,
+    random(1,10,R),
+    get_random_move(R, Move1, Score1, Type1, Move2, Score2, Type2, Move, Score, Type),!.
+
+get_random_move(R, Move1, Score1, Type1, _, _, _, Move1, Score1, Type1):-
+    R < 6,!.
+get_random_move(_, _, _, _, Move2, Score2, Type2, Move2, Score2, Type2).
+    
+get_score([H|T], C, Type):-
+    head(T, L),!,
+    verifPion2(H, L, C, Type).
+
+/* Boucle pour déterminer nombre de pions adverses avec aspiration/collision */
+verifPion2(X, Y, C, T) :- 
+    verifPion_droite(X, Y, C, T),!;
+    verifPion_bas(X, Y, C, T),!;
+    verifPion_basDroite(X, Y, C, T),!;
+    verifPion_basGauche(X, Y, C, T),!;
+    verifPion_gauche(X, Y, C, T),!;
+    verifPion_haut(X, Y, C, T),!;
+    verifPion_hautDroite(X, Y, C, T),!;
+    verifPion_hautGauche(X, Y, C, T),!.
+
+verifPion_haut(X,Y,C,T) :- 
+    cell(X, B),
+    nbrPion_haut2(Y, B, C1), nbrPion_bas_ParAspiration(X,B,C2),
+    eval_aspiration_vs_collision(C1,C2,C,T),!.
+nbrPion_haut2(Y,_,0) :- not(haut(Y,_)),!.
+nbrPion_haut2(Y,_,0) :- haut(Y,Z), cell(Z,B), B == -,!.
+nbrPion_haut2(Y,C,0) :- haut(Y,Z), cell(Z,B), B == C,!.
+nbrPion_haut2(Y,C,Count) :- haut(Y,Z), compteur_haut(Z,C,Count).
+
+compteur_haut(Y,C,0) :- cell(Y,B), B == C,!.
+compteur_haut(Y,_,1) :- haut(Y,Z), cell(Z,B), B == -,!.
+compteur_haut(Y,_,1) :- not(haut(Y,_)),!.
+compteur_haut(Y,C,Count) :-
+    haut(Y,Z),
+    compteur_haut(Z,C,Count2),
+    Count is Count2 + 1.
+    
+nbrPion_bas_ParAspiration(X,_,0) :- not(bas(X,_)),!.
+nbrPion_bas_ParAspiration(X,_,0) :- bas(X,Z), cell(Z,B), B == -,!.
+nbrPion_bas_ParAspiration(X,C,0) :- bas(X,Z), cell(Z,B), B == C,!.
+nbrPion_bas_ParAspiration(X,C,Count) :- bas(X,Y), compteur_bas_aspiration(Y,C,Count).
+
+compteur_bas_aspiration(X,C,0) :- cell(X,B), B == C,!.
+compteur_bas_aspiration(X,_,1) :- bas(X,Z), cell(Z,B), B == -,!.
+compteur_bas_aspiration(X,_,1) :- not(bas(X,_)),!.
+compteur_bas_aspiration(X,C,Count) :-
+    bas(X,Z),
+    compteur_bas_aspiration(Z,C,Count2),
+    Count is Count2 + 1.
+
+verifPion_bas(X,Y,C,T) :- 
+    cell(X, B),
+    nbrPion_bas(Y, B, C1), nbrPion_haut_ParAspiration(X,B,C2),
+    eval_aspiration_vs_collision(C1,C2,C,T),!.
+nbrPion_bas(Y,_,0) :- not(bas(Y,_)),!.
+nbrPion_bas(Y,_,0) :- bas(Y,Z), cell(Z,B), B == -,!.
+nbrPion_bas(Y,C,0) :- bas(Y,Z), cell(Z,B), B == C,!.
+nbrPion_bas(Y,C,Count) :- compteur_bas(Y,C,Count).
+compteur_bas(Y,_,0) :- not(bas(Y,_)),!.
+compteur_bas(Y,C,0) :- cell(Y,B), B == C,!.
+compteur_bas(Y,_,0) :- bas(Y,Z), cell(Z,B), B == -,!.
+compteur_bas(Y,C,Count) :-
+    bas(Y,Z),
+    compteur_bas(Z,C,Count2),
+    Count is Count2 + 1.
+nbrPion_haut_ParAspiration(X,_,0) :- not(haut(X,_)),!.
+nbrPion_haut_ParAspiration(X,_,0) :- haut(X,Z), cell(Z,B), B == -,!.
+nbrPion_haut_ParAspiration(X,C,0) :- haut(X,Z), cell(Z,B), B == C,!.
+nbrPion_haut_ParAspiration(X,C,Count) :- haut(X,Y), compteur_haut_aspiration(Y,C,Count).
+compteur_haut_aspiration(X,C,0) :- cell(X,B), B == C,!.
+compteur_haut_aspiration(X,_,1) :- not(haut(X,_)),!.
+compteur_haut_aspiration(X,_,0) :- haut(X,Z), cell(Z,B), B == -,!.
+compteur_haut_aspiration(X,C,Count) :-
+    haut(X,Z),
+    compteur_haut_aspiration(Z,C,Count2),
+    Count is Count2 + 1.
+
+eval_aspiration_vs_collision(C1, C2, C1,c) :-
+    C1 >= C2.
+eval_aspiration_vs_collision(C1,C2,C2,a) :-
+    C2 > C1.
 
 /* fonction déterminant si un coup est permis */
 can_play(X, Y) :-
@@ -207,8 +343,6 @@ can_play(X, Y) :-
 	haut(X,Y); 
 	hautGauche(X,Y); 
 	basGauche(X,Y).
-	
-
 	
 /* fonction déterminant si un coup est permis pour le joueur ordinateur */
 can_playComp(X, Y) :-
@@ -231,12 +365,13 @@ eliminate(X, A) :-
 /* fonctions d'action dans le jeu */
 play(X, Y) :-	
 	can_play(X,Y),
+
 	retract( cell(X, b) ),
 	assert( cell(X, -) ),
 	retract( cell(Y, -) ),
 	assert( cell(Y, b) ),
-	not(verif_droite(X,Y)),
-	not(verif_haut(X,Y)),
+
+	not(jouer_coup(X,Y)),
 	show_game.
 		
 play_comp(X, Y) :-	
@@ -358,6 +493,3 @@ show_game :-
 % timestamp 30:00 pour vertical / horizontal
 % timestamp 39:30 pour opérations math
 % timestamp 20:00 format de texte
-
-
-

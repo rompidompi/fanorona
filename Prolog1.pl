@@ -1,12 +1,5 @@
 :- dynamic cell/2.
 
-/* positionnement initial */
-%[cell(a5,b), cell(b5,b), cell(c5,b), cell(d5,b), cell(e5,b), cell(f5,b), cell(g5,b), cell(h5,b), cell(i5,b),
-% cell(a4,b), cell(b4,b), cell(c4,b), cell(d4,b), cell(e4,b), cell(f4,b), cell(g4,b), cell(h4,b), cell(i4,b),
-% cell(a3,n), cell(b3,b), cell(c3,n), cell(d3,b), cell(e3,-), cell(f3,n), cell(g3,b), cell(h3,n), cell(i3,b),
-% cell(a2,n), cell(b2,n), cell(c2,n), cell(d2,n), cell(e2,n), cell(f2,n), cell(g2,n), cell(h2,n), cell(i2,n),
-% cell(a1,n), cell(b1,n), cell(c1,n), cell(d1,n), cell(e1,n), cell(f1,n), cell(g1,n), cell(h1,n), cell(i1,n)].
-
 cell(a5,b).
 cell(b5,n).
 cell(c5,-).
