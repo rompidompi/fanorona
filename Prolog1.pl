@@ -25,7 +25,7 @@ cell(f4,-).
 cell(g4,n).
 cell(h4,-).
 cell(i4,-).
-cell(a3,n).
+cell(a3,b).
 cell(b3,b). 
 cell(c3,n). 
 cell(d3,b). 
@@ -290,9 +290,10 @@ nbrPion_bas_ParAspiration(X,_,0) :- not(bas(X,_)),!.
 nbrPion_bas_ParAspiration(X,_,0) :- bas(X,Z), cell(Z,B), B == -,!.
 nbrPion_bas_ParAspiration(X,C,0) :- bas(X,Z), cell(Z,B), B == C,!.
 nbrPion_bas_ParAspiration(X,C,Count) :- bas(X,Y), compteur_bas_aspiration(Y,C,Count).
+
 compteur_bas_aspiration(X,C,0) :- cell(X,B), B == C,!.
+compteur_bas_aspiration(X,_,1) :- bas(X,Z), cell(Z,B), B == -,!.
 compteur_bas_aspiration(X,_,1) :- not(bas(X,_)),!.
-compteur_bas_aspiration(X,_,0) :- bas(X,Z), cell(Z,B), B == -,!.
 compteur_bas_aspiration(X,C,Count) :-
     bas(X,Z),
     compteur_bas_aspiration(Z,C,Count2),
